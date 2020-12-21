@@ -1,0 +1,325 @@
+#+title Emacs configuration
+#+PROPERTY: header-args:emacs-lisp :tangle init.el
+
+* packages
+** use-package 
+
+Easier way of installing and configuring packages.
+
+   #+begin_src emacs-lisp
+   (require 'package)
+   (setq package-archives '(("melpa" . "https://melpa.org/packages/")
+   ("org" . "https://orgmode.org/elpa/")
+   ("elpa" . "https://elpa.gnu.org/packages/")))
+   (package-initialize)
+   ;; only necessary during the very first start of emacs when
+   ;; there is no archive at all
+   (unless package-archive-contents
+   (package-refresh-contents))
+   
+   (unless (package-installed-p 'use-package)
+   (package-install 'use-package))
+   (require 'use-package)
+   (setq use-package-always-ensure t)
+
+   #+end_src
+
+** evil 
+
+Enables vim-keys!!!
+
+   #+begin_src emacs-lisp
+   (use-package evil
+     :init
+     (setq evil-want-integration t)
+     (setq eval-want-keybinding nil)
+     :config
+     (evil-mode 1)
+     (define-key evil-motion-state-map " " nil)
+     (define-key evil-motion-state-map (kbd "SPC w") 'evil-window-map)
+     (eval-after-load "evil-maps"
+       (define-key evil-motion-state-map (kbd "C-w") nil)))
+   #+end_src
+
+Prefer to use 'kj' to go back to normal mode
+   #+begin_src emacs-lisp
+   (use-package evil-escape
+     :config
+     (evil-escape-mode)
+     (setq-default evil-escape-key-sequence "kj"))
+   #+end_src
+
+** org-mode
+
+Snippets for code blocks in org-files
+   #+begin_src emacs-lisp
+   (require 'org-tempo)
+   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp")) 
+   #+end_src
+
+** ivy
+
+Improve search functionalities in buffers
+   #+begin_src emacs-lisp
+   (use-package swiper)
+   #+end_src
+
+Fuzzy search for commands and files in minibuffer
+   #+begin_src emacs-lisp
+     (use-package ivy
+       :config
+       (setq ivy-count-format "(%d/%d)")
+       (ivy-mode 1))
+   #+End_src
+
+provides enhanced versions of common emacs commands
+   #+begin_src emacs-lisp
+     (use-package counsel
+       :bind (
+         ("M-x" . counsel-M-x)
+         ("C-h f" . counsel-describe-function)))
+   #+End_src
+   
+Shows shortcuts behind commands and additional
+descriptive text in minibuffer
+   #+begin_src emacs-lisp
+     (use-package ivy-rich
+       :init
+       (ivy-rich-mode 1))
+   #+End_src
+** which-key
+
+Shows which keys are possible for incomplete entered
+commands
+   #+begin_src emacs-lisp
+   (use-package which-key
+     :config
+     (which-key-mode))
+   #+end_src
+
+** rainbow-delimiters
+
+Coloring of parentheses, brackets and braces for different
+depth levels.
+   #+begin_src emacs-lisp
+   (use-package rainbow-delimiters
+     :hook (prog-mode . rainbow-delimiters-mode))
+   #+end_src
+
+** helpful
+
+Elisp help pages contain additional information
+   #+begin_src emacs-lisp
+   (use-package helpful
+     :custom (counsel-describe-function-function #'helpful-callable)
+     :bind ([remap describe-function] . #'helpful-callable))
+   #+end_src
+
+** projectile
+
+Keeps track of projects and its files and provide functionalities
+like searching through all files.
+   #+begin_src emacs-lisp
+   (use-package projectile
+     :config (projectile-mode))
+     ;;:bind-keymap ("SPC p" . projectile-command-map))
+   (define-key evil-motion-state-map (kbd "SPC p") 'projectile-command-map)
+   #+end_src
+
+
+provides enhanced versions of common projectile commands like
+"jump to file"
+   #+begin_src emacs-lisp
+   (use-package counsel-projectile
+     :config (counsel-projectile-mode))
+   #+end_src
+
+** magit
+
+A git-client
+   #+begin_src emacs-lisp
+   (use-package magit)
+   (define-key evil-motion-state-map (kbd "SPC g g") 'magit-status)
+   #+end_src
+  
+modifies some magit keys so that it better fits vim-keys,
+for instance 'x' becomes 'delete' for branches. 
+   #+begin_src emacs-lisp
+   (use-package evil-magit
+     :after magit)
+   #+end_src
+
+** lsp
+
+Language server protocol client allows to connect to 
+various language servers for instance for python or R.
+   #+begin_src emacs-lisp
+   (use-package lsp-mode
+     :commands (lsp lsp-deferred)
+     :init (setq lsp-keymap-prefix "C-c l")
+     :config (lsp-enable-which-key-integration t))
+   #+end_src
+
+Enables "pop-up's" with additional information about
+the current symbol or documentation for functions, etc.
+   #+begin_src emacs-lisp
+   (use-package lsp-ui
+     :hook (lsp-mode . lsp-ui-mode))
+   #+end_src
+
+** flycheck
+
+Online linting of source code
+   #+begin_src emacs-lisp
+   (use-package flycheck)
+   #+end_src
+
+Text completion 
+** company-mode
+   #+begin_src emacs-lisp
+   (use-package company
+     :after lsp-mode
+     :hook (lsp-mode . company-mode)
+     :bind (:map company-active-map
+             ("<tab>" . company-complete-selection))
+	   (:map lsp-mode-map
+	     ("<tab>" . company-indent-or-complete-common))
+     :custom 
+     (company-minimum-prefix-length 1)
+     (company-show-numbers t)
+     (company-idle-delay 0.0))
+   #+end_src
+
+* languages
+** python
+   #+begin_src emacs-lisp
+   (use-package python-mode
+     :hook (python-mode . lsp-deferred))
+   #+end_src
+
+** R (ess)
+   #+begin_src emacs-lisp
+   (use-package ess
+     :hook (ess-mode . lsp-deferred)
+     :config (setq-default ess-style 'RStudio-)
+     (setq ess-eval-visibly 't))
+   #+end_src
+
+   #+begin_src emacs-lisp
+
+   (defun ess-pkgdown-site ()
+     "Interface to tinytest"
+     (interactive)
+     (projectile-save-project-buffers)
+     (ess-eval-linewise
+      "roxygen2::roxygenize(); options(pkgdown.internet = FALSE); pkgdown::build_site(preview = FALSE)"
+      "Build pkgdown site"))
+   (define-key evil-motion-state-map (kbd "SPC r d s") 'ess-pkgdown-site)
+
+   (defun ess-pkgdown-articles ()
+     "Interface to tinytest"
+     (interactive)
+     (projectile-save-project-buffers)
+     (ess-eval-linewise
+      "roxygen2::roxygenize(); options(pkgdown.internet = FALSE); pkgdown::build_articles(preview = FALSE)"
+      "Build pkgdown articles"))
+   (define-key evil-motion-state-map (kbd "SPC r d a") 'ess-pkgdown-articles)
+
+   (defun ess-r-tinytest ()
+     "Interface to tinytest"
+     (interactive)
+     (projectile-save-project-buffers)
+     (ess-r-package-eval-linewise
+      "pkgload::load_all(); tinytest::test_all()"
+      "Load package. Test with tinytest"))
+
+   (defun ess-print-at-point ()
+     "print of whats at point"
+     (interactive)
+     (let ((target (thing-at-point 'symbol)))
+       (ess-eval-linewise
+	(format "%s" target)
+	(format "Print instance: %s" target))))
+
+   (defun ess-head-at-point ()
+     "prints head of whats at point"
+     (interactive)
+     (let ((target (thing-at-point 'symbol)))
+       (ess-eval-linewise
+	(format "head(%s)" target)
+	(format "Head of instance: %s" target))))
+
+   (defun ess-tail-at-point ()
+     "prints tail of whats at point"
+     (interactive)
+     (let ((target (thing-at-point 'symbol)))
+       (ess-eval-linewise
+	(format "tail(%s)" target)
+	(format "Tail of instance: %s" target))))
+
+   (defun drake-load-at-point ()
+     "load drake-target at point"
+     (interactive)
+     (let ((target (thing-at-point 'symbol)))
+       (ess-eval-linewise
+	(format "drake::loadd(%s)" target)
+	(format "Load target: %s" target))))
+
+   (defun drake-load-at-point-and-print ()
+     "load drake-target at point and print"
+     (interactive)
+     (drake-load-at-point)
+     (ess-print-at-point))
+
+   (defun drake-load-at-point-and-head ()
+     "load drake-target at point and print head"
+     (interactive)
+     (drake-load-at-point)
+     (ess-head-at-point))
+
+   (defun drake-prep-run ()
+     "prep drake run"
+     (interactive)
+     (projectile-save-project-buffers)
+     (ess-eval-linewise
+      "source('prep_drake_run.R')"
+      "Prepare next drake run"))
+
+   (defun drake-exec-run ()
+     "execute drake run"
+     (interactive)
+     (projectile-save-project-buffers)
+     (ess-eval-linewise
+      "execute_plans(confirm = FALSE)"
+      "Execute drake run"))
+   #+end_src
+* ui
+** general
+
+Remove various UI-elements
+   #+begin_src emacs-lisp
+   (setq inhibit-startup-screen t)
+   (scroll-bar-mode -1)
+   (tool-bar-mode -1)
+   (menu-bar-mode -1)
+   (tooltip-mode -1)
+   #+end_src
+
+Add additional UI-info
+   #+begin_src emacs-lisp
+   (column-number-mode)
+   (global-display-line-numbers-mode t)
+   (setq display-line-numbers-type 'relative)
+   #+end_src
+
+** theme
+   #+begin_src emacs-lisp
+   (use-package doom-themes)
+   (load-theme 'doom-dracula t)
+   #+end_src
+
+   #+begin_src emacs-lisp
+   (use-package doom-modeline
+     :init (doom-modeline-mode 1))
+   #+end_src
+   
