@@ -192,6 +192,35 @@ Text completion
      (company-idle-delay 0.0))
    #+end_src
 
+** prescient
+
+Sorts commands based on frequence of usage
+   #+begin_src emacs-lisp
+   (use-package ivy-prescient
+     :after counsel
+     :config (ivy-prescient-mode))
+   #+end_src
+
+** avy
+
+Jump around by specifying a sequence of chars
+   #+begin_src emacs-lisp
+   (use-package avy
+     :config
+     (define-key evil-motion-state-map (kbd "SPC s") 'avy-goto-char-timer))
+   #+end_src
+
+** winner
+
+Switch through layouts from the history
+   #+begin_src emacs-lisp
+   (use-package winner
+     :config (winner-mode)
+     :bind (
+       :map evil-window-map
+       ("p" . winner-undo)
+       ("n" . winner-redo)))
+   #+end_src
 * languages
 ** python
    #+begin_src emacs-lisp
