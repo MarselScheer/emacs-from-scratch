@@ -61,7 +61,9 @@ Snippets for code blocks in org-files
 
 Improve search functionalities in buffers
    #+begin_src emacs-lisp
-   (use-package swiper)
+   (use-package swiper
+     :bind 
+     ("C-s" . swiper))
    #+end_src
 
 Fuzzy search for commands and files in minibuffer
@@ -77,7 +79,8 @@ provides enhanced versions of common emacs commands
      (use-package counsel
        :bind (
          ("M-x" . counsel-M-x)
-         ("C-h f" . counsel-describe-function)))
+         ("C-h f" . counsel-describe-function)
+         ("C-h v" . counsel-describe-variable)))
    #+End_src
    
 Shows shortcuts behind commands and additional
@@ -122,7 +125,6 @@ like searching through all files.
    #+begin_src emacs-lisp
    (use-package projectile
      :config (projectile-mode))
-     ;;:bind-keymap ("SPC p" . projectile-command-map))
    (define-key evil-motion-state-map (kbd "SPC p") 'projectile-command-map)
    #+end_src
 
@@ -335,6 +337,14 @@ Add additional UI-info
    (column-number-mode)
    (global-display-line-numbers-mode t)
    (setq display-line-numbers-type 'relative)
+   #+end_src
+
+General key bindings
+   #+begin_src emacs-lisp
+   (define-key evil-motion-state-map (kbd "SPC :") 'counsel-M-x)
+   (define-key evil-motion-state-map (kbd "SPC b k") 'kill-buffer)
+   (define-key evil-motion-state-map (kbd "SPC b b") 'counsel-switch-buffer)
+   (define-key evil-motion-state-map (kbd "SPC b o") 'counsel-switch-buffer-other-window)
    #+end_src
 
 ** theme
