@@ -179,17 +179,13 @@ Online linting of source code
 Text completion 
 ** company-mode
    #+begin_src emacs-lisp
-   (use-package company
-     :after lsp-mode
-     :hook (lsp-mode . company-mode)
-     :bind (:map company-active-map
-             ("<tab>" . company-complete-selection))
-	   (:map lsp-mode-map
-	     ("<tab>" . company-indent-or-complete-common))
-     :custom 
-     (company-minimum-prefix-length 1)
-     (company-show-numbers t)
-     (company-idle-delay 0.0))
+     (use-package company
+       :after lsp-mode
+       :hook (lsp-mode . company-mode)
+       :custom 
+       (company-minimum-prefix-length 1)
+       (company-show-numbers t)
+       (company-idle-delay 0.0))
    #+end_src
 
 ** prescient
@@ -220,6 +216,21 @@ Switch through layouts from the history
        :map evil-window-map
        ("p" . winner-undo)
        ("n" . winner-redo)))
+   #+end_src
+
+** yasnippet
+
+Provides snippet functionality
+   #+begin_src emacs-lisp
+   (use-package yasnippet
+     :config
+     (yas-reload-all)
+     :hook (python-mode . yas-minor-mode))
+   #+end_src
+
+Various snippets
+   #+begin_src emacs-lisp
+   (use-package yasnippet-snippets)
    #+end_src
 * languages
 ** python
