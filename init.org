@@ -194,7 +194,32 @@ Text completion
 ** python
    #+begin_src emacs-lisp
    (use-package python-mode
-     :hook (python-mode . lsp-deferred))
+     :hook (python-mode . lsp-deferred)
+     :config
+     (setq py-split-window-on-execute nil))
+   #+end_src
+
+   #+begin_src emacs-lisp
+   (defun ms/py-execute-buffer ()
+     "Saves projects and sends buffer"
+     (interactive)
+     (projectile-save-project-buffers)
+     (py-execute-buffer))
+   (define-key evil-motion-state-map (kbd "SPC r b") 'ms/py-execute-buffer)
+
+   (defun ms/py-execute-class ()
+     "Saves projects and sends class"
+     (interactive)
+     (projectile-save-project-buffers)
+     (py-execute-class))
+   (define-key evil-motion-state-map (kbd "SPC r c") 'ms/py-execute-class)
+
+   (defun ms/py-execute-region ()
+     "Saves projects and sends region"
+     (interactive)
+     (projectile-save-project-buffers)
+     (py-execute-region))
+   (define-key evil-motion-state-map (kbd "SPC r r") 'ms/kjpy-execute-region)
    #+end_src
 
 ** R (ess)
