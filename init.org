@@ -257,24 +257,15 @@ Various snippets
    #+begin_src emacs-lisp
    (use-package python-mode
      :hook (python-mode . lsp-deferred)
-     :bind (
-       :map evil-motion-state-map
-       ("SPC r i" . py-switch-to-shell)
-       ("SPC r b" . ms/py-execute-buffer)
-       ("SPC r c" . ms/py-execute-class)
-       ("SPC r r" . ms/py-execute-region))
      :config
+     (evil-define-key 'normal 'local (kbd "SPC r i") 'py-switch-to-shell)
+     (evil-define-key 'normal 'local (kbd "SPC r b") 'ms/py-execute-buffer)
+     (evil-define-key 'normal 'local (kbd "SPC r c") 'ms/py-execute-class)
+     (evil-define-key 'normal 'local (kbd "SPC r r") 'ms/py-execute-region)
      (setq py-split-window-on-execute nil))
    #+end_src
 
-
 ** R (ess)
-   #+begin_src emacs-lisp
-   (use-package ess
-     :hook (ess-mode . lsp-deferred)
-     :config (setq-default ess-style 'RStudio-)
-     (setq ess-eval-visibly 't))
-   #+end_src
 
    #+begin_src emacs-lisp
 
@@ -285,7 +276,6 @@ Various snippets
      (ess-eval-linewise
       "roxygen2::roxygenize(); options(pkgdown.internet = FALSE); pkgdown::build_site(preview = FALSE)"
       "Build pkgdown site"))
-   (define-key evil-motion-state-map (kbd "SPC r d s") 'ess-pkgdown-site)
 
    (defun ess-pkgdown-articles ()
      "Interface to tinytest"
@@ -294,7 +284,6 @@ Various snippets
      (ess-eval-linewise
       "roxygen2::roxygenize(); options(pkgdown.internet = FALSE); pkgdown::build_articles(preview = FALSE)"
       "Build pkgdown articles"))
-   (define-key evil-motion-state-map (kbd "SPC r d a") 'ess-pkgdown-articles)
 
    (defun ess-r-tinytest ()
      "Interface to tinytest"
@@ -363,6 +352,24 @@ Various snippets
      (ess-eval-linewise
       "execute_plans(confirm = FALSE)"
       "Execute drake run"))
+   #+end_src
+
+   #+begin_src emacs-lisp
+   (use-package ess
+     :hook (ess-mode . lsp-deferred)
+     :config
+     (setq-default ess-style 'RStudio-)
+     (evil-define-key 'normal 'local (kbd "SPC r d a") 'ess-pkgdown-articles)
+     (evil-define-key 'normal 'local (kbd "SPC r d s") 'ess-pkgdown-site)
+     (evil-define-key 'normal 'local (kbd "SPC r b") 'ess-eval-buffer)
+     (evil-define-key 'normal 'local (kbd "SPC r s") 'ess-eval-buffer-from-beg-to-here)
+     (evil-define-key 'normal 'local (kbd "SPC r e") 'ess-eval-buffer-from-here-to-end)
+     (evil-define-key 'normal 'local (kbd "SPC r r") 'ess-eval-region-or-function-or-paragraph)
+     (evil-define-key 'normal 'local (kbd "SPC r k") 'ess-head-at-point)
+     (evil-define-key 'normal 'local (kbd "SPC r j") 'ess-tail-at-point)
+     (evil-define-key 'normal 'local (kbd "SPC r p") 'ess-print-at-point)
+     (evil-define-key 'normal 'local (kbd "SPC p P") 'ess-r-tinytest)
+     (setq ess-eval-visibly 't))
    #+end_src
 * ui
 ** general
