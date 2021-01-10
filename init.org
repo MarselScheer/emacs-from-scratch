@@ -49,14 +49,6 @@ Prefer to use 'kj' to go back to normal mode
      (setq-default evil-escape-key-sequence "kj"))
    #+end_src
 
-** org-mode
-
-Snippets for code blocks in org-files
-   #+begin_src emacs-lisp
-   (require 'org-tempo)
-   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp")) 
-   #+end_src
-
 ** ivy
 
 Improve search functionalities in buffers
@@ -225,8 +217,11 @@ Provides snippet functionality
    (use-package yasnippet
      :config
      (yas-reload-all)
-     :hook (python-mode . yas-minor-mode))
+     :hook
+     (python-mode . yas-minor-mode)
+     (org-mode . yas-minor-mode))
    #+end_src
+
 
 Various snippets
    #+begin_src emacs-lisp
