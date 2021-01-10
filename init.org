@@ -49,6 +49,15 @@ Prefer to use 'kj' to go back to normal mode
      (setq-default evil-escape-key-sequence "kj"))
    #+end_src
 
+** org
+
+   #+begin_src emacs-lisp
+   (use-package org
+     :config
+     ;; timestamp and note for closing a todo
+     (setq org-log-done 'note))
+   #+end_src
+
 ** ivy
 
 Improve search functionalities in buffers
