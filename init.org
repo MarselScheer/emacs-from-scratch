@@ -237,6 +237,13 @@ Various snippets
    (use-package yasnippet-snippets)
    #+end_src
 * languages
+** debugging
+   #+begin_src emacs-lisp
+    (use-package dap-mode
+      :custom
+      (dap-auto-configure-features '(expressions)))
+   #+end_src
+
 ** python
    #+begin_src emacs-lisp
      (defun ms/py-execute-buffer ()
@@ -262,6 +269,7 @@ Various snippets
    (use-package python-mode
      :hook (python-mode . lsp-deferred)
      :config
+     (require 'dap-python)
      (evil-define-key 'normal 'python-mode-map (kbd "SPC r i") 'py-switch-to-shell)
      (evil-define-key 'normal 'python-mode-map (kbd "SPC r b") 'ms/py-execute-buffer)
      (evil-define-key 'normal 'python-mode-map (kbd "SPC r c") 'ms/py-execute-class)
