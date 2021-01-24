@@ -23,6 +23,13 @@ Easier way of installing and configuring packages.
    (setq use-package-always-ensure t)
 
    #+end_src
+** org
+   #+begin_src emacs-lisp
+   (defun ms/org-mode-setup()
+     (org-mode-indent))
+   (use-package org
+     :hook (org-mode . ms/org-mode-setup))
+   #+end_src
 
 ** evil 
 
