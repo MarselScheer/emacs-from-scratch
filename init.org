@@ -304,6 +304,19 @@ Various snippets
       "roxygen2::roxygenize(); options(pkgdown.internet = FALSE); pkgdown::build_articles(preview = FALSE)"
       "Build pkgdown articles"))
 
+    (setq ms/default-test-file nil)
+    (setq ms/default-test-dir nil)
+
+    (defun ess-r-tinytest-file (file)
+      "Interface to tinytest"
+      (interactive (list (read-file-name "Select test file:" ms/default-test-dir nil nil ms/default-test-file)))
+      (setq ms/default-test-dir (concat (f-dirname file) "/"))
+      (setq ms/default-test-file (f-filename file))
+      (projectile-save-project-buffers)
+      (ess-r-package-eval-linewise
+        (format "pkgload::load_all(); tinytest::run_test_file('%s')" file)
+        "Load package. Run test file"))
+
    (defun ess-r-tinytest ()
      "Interface to tinytest"
      (interactive)
@@ -387,6 +400,7 @@ Various snippets
      (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r k") 'ess-head-at-point)
      (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r j") 'ess-tail-at-point)
      (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r p") 'ess-print-at-point)
+     (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r t") 'ess-r-tinytest-file)
      (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC p P") 'ess-r-tinytest)
      (setq ess-eval-visibly 't))
    #+end_src
