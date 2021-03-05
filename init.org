@@ -46,6 +46,12 @@ Enables vim-keys!!!
      (define-key evil-motion-state-map (kbd "SPC w") 'evil-window-map)
      (eval-after-load "evil-maps"
        (define-key evil-motion-state-map (kbd "C-w") nil)))
+
+   (use-package evil-collection
+     :after evil
+     :ensure t
+     :config
+     (evil-collection-init))
    #+end_src
 
 Prefer to use 'kj' to go back to normal mode
@@ -152,13 +158,6 @@ A git-client
    (define-key evil-motion-state-map (kbd "SPC g g") 'magit-status)
    #+end_src
   
-modifies some magit keys so that it better fits vim-keys,
-for instance 'x' becomes 'delete' for branches. 
-   #+begin_src emacs-lisp
-   (use-package evil-magit
-     :after magit)
-   #+end_src
-
 ** lsp
 
 Language server protocol client allows to connect to 
