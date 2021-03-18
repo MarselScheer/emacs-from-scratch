@@ -264,11 +264,11 @@ Various snippets
        (projectile-save-project-buffers)
        (py-execute-class))
 
-     (defun ms/py-execute-region ()
+     (defun ms/py-execute-region (beg end)
        "Saves projects and sends region"
-       (interactive)
+       (interactive "r")
        (projectile-save-project-buffers)
-       (py-execute-region))
+       (py-execute-region beg end))
    #+end_src
 
    #+begin_src emacs-lisp
