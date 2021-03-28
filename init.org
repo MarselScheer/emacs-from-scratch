@@ -255,8 +255,14 @@ Various snippets
      (defun ms/py-execute-buffer ()
        "Saves projects and sends buffer"
        (interactive)
+       (when (get-buffer "*Python*")
+	    (let ((kill-buffer-query-functions nil))
+		(kill-buffer "*Python*")))
        (projectile-save-project-buffers)
-       (py-execute-buffer))
+       (py-execute-buffer)
+       (let ((my-window (get-buffer-window)))
+	    (ivy--switch-buffer-other-window-action "*Python*")
+	    (select-window my-window)))
 
      (defun ms/py-execute-class ()
        "Saves projects and sends class"
