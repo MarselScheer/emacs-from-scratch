@@ -286,6 +286,11 @@ Various snippets
        (evil-define-key 'normal 'python-mode-map (kbd "SPC r c") 'ms/py-execute-class)
        (evil-define-key 'normal 'python-mode-map (kbd "SPC r r") 'ms/py-execute-region)
        (setq py-split-window-on-execute nil))
+     (use-package lsp-pyright
+       :ensure t
+       :hook (python-mode . (lambda ()
+                              (require 'lsp-pyright)
+                              (lsp))))  ; or lsp-deferred
    #+end_src
 
 ** R (ess)
