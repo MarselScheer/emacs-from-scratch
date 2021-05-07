@@ -30,6 +30,16 @@ Easier way of installing and configuring packages.
        :hook (org-mode . ms/org-mode-setup))
    #+end_src
 
+** dired
+
+   With two dired-buffer copy will by default guess that we
+   want to copy to the other buffer.
+   #+begin_src emacs-lisp
+     (defun ms/dired-mode-setup()
+       (setq dired-dwim-target t))
+     (add-hook 'dired-mode-hook 'ms/dired-mode-setup)
+   #+end_src
+   
 ** evil 
 
 Enables vim-keys!!!
