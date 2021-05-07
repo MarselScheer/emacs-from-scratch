@@ -41,10 +41,7 @@ Enables vim-keys!!!
        (setq eval-want-keybinding nil)
        :config
        (evil-mode 1)
-       (define-key evil-motion-state-map " " nil)
-       (define-key evil-motion-state-map (kbd "SPC w") 'evil-window-map)
-       (eval-after-load "evil-maps"
-	 (define-key evil-motion-state-map (kbd "C-w") nil)))
+       (define-key evil-motion-state-map " " nil))
 
      (use-package evil-collection
        :after evil
@@ -432,12 +429,39 @@ Add additional UI-info
      (setq display-line-numbers-type 'relative)
    #+end_src
 
-General key bindings
+General key bindings. Copied from https://github.com/emacs-evil/evil-collection
    #+begin_src emacs-lisp
-     (define-key evil-motion-state-map (kbd "SPC :") 'counsel-M-x)
-     (define-key evil-motion-state-map (kbd "SPC b k") 'kill-buffer)
-     (define-key evil-motion-state-map (kbd "SPC b b") 'counsel-switch-buffer)
-     (define-key evil-motion-state-map (kbd "SPC b o") 'counsel-switch-buffer-other-window)
+     (defvar my-intercept-mode-map (make-sparse-keymap)
+       "High precedence keymap.")
+
+     (define-minor-mode my-intercept-mode
+       "Global minor mode for higher precedence evil keybindings."
+       :global t)
+
+     (my-intercept-mode)
+
+     (dolist (state '(normal visual insert))
+       (evil-make-intercept-map
+	;; NOTE: This requires an evil version from 2018-03-20 or later
+	(evil-get-auxiliary-keymap my-intercept-mode-map state t t)
+	state))
+
+     (evil-define-key 'normal my-intercept-mode-map
+       (kbd "SPC SPC") 'counsel-M-x)
+     (evil-define-key 'normal my-intercept-mode-map
+       (kbd "SPC b f") 'find-file)
+     (evil-define-key 'normal my-intercept-mode-map
+       (kbd "SPC b b") 'counsel-switch-buffer)
+     (evil-define-key 'normal my-intercept-mode-map
+       (kbd "SPC b k") 'kill-buffer)
+     (evil-define-key 'normal my-intercept-mode-map
+       (kbd "SPC b b") 'counsel-switch-buffer)
+     (evil-define-key 'normal my-intercept-mode-map
+       (kbd "SPC b b") 'counsel-switch-buffer)
+     (evil-define-key 'normal my-intercept-mode-map
+       (kbd "SPC b o") 'counsel-switch-buffer-other-window)
+     (evil-define-key 'normal my-intercept-mode-map
+       (kbd "SPC w") 'evil-window-map)
    #+end_src
 
 ** theme
