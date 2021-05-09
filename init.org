@@ -240,6 +240,7 @@ Provides snippet functionality
        (yas-reload-all)
        :hook
        (python-mode . yas-minor-mode)
+       (ess-mode . yas-minor-mode)
        (org-mode . yas-minor-mode))
    #+end_src
 
