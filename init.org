@@ -408,6 +408,7 @@ Various snippets
        :hook (ess-mode . lsp-deferred)
        :config
        (setq-default ess-style 'RStudio-)
+       (evil-define-key 'insert 'ess-r-mode-map (kbd "C-p") 'company-manual-begin)
        (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r d a") 'ess-pkgdown-articles)
        (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r d s") 'ess-pkgdown-site)
        (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r b") 'ess-eval-buffer)
