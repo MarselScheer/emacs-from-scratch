@@ -210,13 +210,17 @@ Sorts commands based on frequence of usage
        :config (ivy-prescient-mode))
    #+end_src
 
-** avy
+** avy/ace-jump
 
-Jump around by specifying a sequence of chars
+Jump around by specifying a sequence of chars (avy) or
+first char of a word (ace-jump)
    #+begin_src emacs-lisp
-     (use-package avy
+     ;; (use-package avy
+     ;;   :config
+     ;;   (define-key evil-motion-state-map (kbd "SPC s") 'avy-goto-char-timer))
+     (use-package ace-jump-mode
        :config
-       (define-key evil-motion-state-map (kbd "SPC s") 'avy-goto-char-timer))
+       (define-key evil-motion-state-map (kbd "SPC s") 'ace-jump-word-mode))
    #+end_src
 
 ** winner
