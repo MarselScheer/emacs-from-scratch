@@ -488,6 +488,8 @@ General key bindings. Copied from https://github.com/emacs-evil/evil-collection
 
    #+begin_src emacs-lisp
      (use-package doom-modeline
-       :init (doom-modeline-mode 1))
+      :init (doom-modeline-mode 0))
+     (use-package telephone-line)
+     (telephone-line-mode 1)
    #+end_src
    
