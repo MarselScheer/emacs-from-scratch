@@ -253,6 +253,60 @@ Various snippets
    #+begin_src emacs-lisp
      (use-package yasnippet-snippets)
    #+end_src
+** symon
+
+Systemmonitor in the minibuffer
+
+   #+begin_src emacs-lisp
+     (use-package symon
+       :config
+       (setq symon-delay 5)
+       (symon-mode))
+   #+end_src
+
+** beacon
+
+Cursor highlighting after switch windows
+
+   #+begin_src emacs-lisp
+     (use-package beacon
+       :config
+       (beacon-mode 1)
+       (setq beacon-blink-duration 2))
+   #+end_src
+
+** indent-guide
+
+Provides vertical lines from the beginning to the end
+of a 'indentation-level' the cursor is in.
+
+   #+begin_src emacs-lisp
+     (use-package indent-guide
+       :config (indent-guide-global-mode))
+   #+end_src
+
+** git
+*** diff-hl
+
+Highlights which part differ from HEAD.
+
+   #+begin_src emacs-lisp
+     (use-package diff-hl
+       :config (global-diff-hl-mode))
+   #+end_src
+
+
+** git-commit-messages
+
+Allows to show the commit-message corresponding to the
+line the cursor is in as a popup and also show the
+parent-commits from there on.
+
+   #+begin_src emacs-lisp
+     (use-package git-messenger
+       :config (setq git-messenger:show-detail t))
+   #+end_src
+
 * languages
 ** debugging
    #+begin_src emacs-lisp
