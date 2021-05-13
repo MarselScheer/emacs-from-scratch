@@ -359,8 +359,8 @@ parent-commits from there on.
                               (lsp))))  ; or lsp-deferred
    #+end_src
 
-** R (ess)
-
+** R 
+*** ess
    #+begin_src emacs-lisp
 
      (defun ess-pkgdown-site ()
@@ -480,6 +480,17 @@ parent-commits from there on.
        (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC p P") 'ess-r-tinytest)
        (setq ess-eval-visibly 't))
    #+end_src
+
+*** poly-R-markdown
+
+Polymode for working with Rmd-files
+
+   #+begin_src emacs-lisp
+     (use-package poly-R
+       :ensure t)
+   #+end_src
+
+
 * ui
 ** general
 
