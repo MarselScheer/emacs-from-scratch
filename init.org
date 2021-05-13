@@ -538,6 +538,10 @@ General key bindings. Copied from https://github.com/emacs-evil/evil-collection
    #+begin_src emacs-lisp
      (use-package doom-themes)
      (load-theme 'doom-dracula t)
+     ;; (use-package cyberpunk-theme)
+     ;; (load-theme 'cyberpunk t)
+     (custom-set-faces
+      '(ivy-current-match ((t (:extend t :background "gray10" :foreground "yellow" :box nil :weight bold)))))
    #+end_src
 
    #+begin_src emacs-lisp
