@@ -503,6 +503,12 @@ Remove various UI-elements
      (tooltip-mode -1)
    #+end_src
 
+Show always end of compilation buffer or first error
+   #+begin_src emacs-lisp
+     (custom-set-variables
+      '(compilation-scroll-output 'first-error))
+   #+end_src
+
 Add additional UI-info
    #+begin_src emacs-lisp
      (column-number-mode)
