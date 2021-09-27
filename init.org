@@ -551,6 +551,14 @@ General key bindings. Copied from https://github.com/emacs-evil/evil-collection
        (kbd "SPC w") 'evil-window-map)
    #+end_src
 
+** Compilation buffer
+   #+begin_src emacs-lisp
+     (require 'ansi-color)
+     (defun colorize-compilation-buffer ()
+       (ansi-color-apply-on-region compilation-filter-start (point-max)))
+     (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
+   #+end_src
+
 ** theme
    #+begin_src emacs-lisp
      (use-package doom-themes)
