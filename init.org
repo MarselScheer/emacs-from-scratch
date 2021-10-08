@@ -362,6 +362,14 @@ parent-commits from there on.
 ** R 
 *** ess
    #+begin_src emacs-lisp
+     (defun show-R-buffer ()
+       (switch-to-buffer-other-window
+	(buffer-name
+	 (car
+	  (seq-filter
+	   (lambda (b) (string-prefix-p "*R:" (buffer-name b)))
+	   (buffer-list)))))
+       (switch-to-buffer-other-window (other-buffer (current-buffer) 1)))
 
      (defun ess-pkgdown-site ()
        "Interface to tinytest"
@@ -406,7 +414,8 @@ parent-commits from there on.
        (let ((target (thing-at-point 'symbol)))
 	 (ess-eval-linewise
 	  (format "%s" target)
-	  (format "Print instance: %s" target))))
+	  (format "Print instance: %s" target)))
+       (show-R-buffer))
 
      (defun ess-head-at-point ()
        "prints head of whats at point"
@@ -414,7 +423,8 @@ parent-commits from there on.
        (let ((target (thing-at-point 'symbol)))
 	 (ess-eval-linewise
 	  (format "head(%s)" target)
-	  (format "Head of instance: %s" target))))
+	  (format "Head of instance: %s" target)))
+       (show-R-buffer))
 
      (defun ess-tail-at-point ()
        "prints tail of whats at point"
@@ -430,19 +440,22 @@ parent-commits from there on.
        (let ((target (thing-at-point 'symbol)))
 	 (ess-eval-linewise
 	  (format "drake::loadd(%s)" target)
-	  (format "Load target: %s" target))))
+	  (format "Load target: %s" target)))
+       (show-R-buffer))
 
      (defun drake-load-at-point-and-print ()
        "load drake-target at point and print"
        (interactive)
        (drake-load-at-point)
-       (ess-print-at-point))
+       (ess-print-at-point)
+       (show-R-buffer))
 
      (defun drake-load-at-point-and-head ()
        "load drake-target at point and print head"
        (interactive)
        (drake-load-at-point)
-       (ess-head-at-point))
+       (ess-head-at-point)
+       (show-R-buffer))
 
      (defun drake-prep-run ()
        "prep drake run"
@@ -450,7 +463,8 @@ parent-commits from there on.
        (projectile-save-project-buffers)
        (ess-eval-linewise
 	"source('prep_drake_run.R')"
-	"Prepare next drake run"))
+	"Prepare next drake run")
+       (show-R-buffer))
 
      (defun drake-exec-run ()
        "execute drake run"
@@ -458,7 +472,8 @@ parent-commits from there on.
        (projectile-save-project-buffers)
        (ess-eval-linewise
 	"execute_plans(confirm = FALSE)"
-	"Execute drake run"))
+	"Execute drake run")
+       (show-R-buffer))
    #+end_src
 
    #+begin_src emacs-lisp
@@ -467,6 +482,9 @@ parent-commits from there on.
        :config
        (setq-default ess-style 'RStudio-)
        (evil-define-key 'insert 'ess-r-mode-map (kbd "C-p") 'company-manual-begin)
+       (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC d p") 'drake-prep-run)
+       (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC d r") 'drake-exec-run)
+       (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC d l") 'drake-load-at-point)
        (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r d a") 'ess-pkgdown-articles)
        (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r d s") 'ess-pkgdown-site)
        (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r b") 'ess-eval-buffer)
