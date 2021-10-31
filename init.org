@@ -295,7 +295,6 @@ Highlights which part differ from HEAD.
        :config (global-diff-hl-mode))
    #+end_src
 
-
 ** git-commit-messages
 
 Allows to show the commit-message corresponding to the
@@ -307,6 +306,14 @@ parent-commits from there on.
        :config (setq git-messenger:show-detail t))
    #+end_src
 
+** docker
+   #+begin_src emacs-lisp
+     (use-package docker
+       :ensure t
+       :bind ("C-c d" . docker)
+       :config (setq docker-run-as-root t))
+   #+end_src
+
 * languages
 ** debugging
    #+begin_src emacs-lisp
@@ -315,6 +322,13 @@ parent-commits from there on.
        (dap-auto-configure-features '(expressions)))
    #+end_src
 
+** dockerfiles
+   #+begin_src emacs-lisp
+     (use-package dockerfile-mode
+       :config
+       (add-to-list 'auto-mode-alist '("Dockerfile\\'" . dockerfile-mode)))
+   #+end_src
+   
 ** python
    #+begin_src emacs-lisp
      (defun ms/py-execute-buffer ()
