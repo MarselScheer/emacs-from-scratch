@@ -314,6 +314,12 @@ parent-commits from there on.
        :config (setq docker-run-as-root t))
    #+end_src
 
+** format-all
+   
+   #+begin_src emacs-lisp
+     (use-package format-all
+       :config (add-hook 'prog-mode-hook 'format-all-mode))
+   #+end_src
 * languages
 ** debugging
    #+begin_src emacs-lisp
