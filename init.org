@@ -177,6 +177,13 @@ various language servers for instance for python or R.
        (lsp-enable-which-key-integration t)
        (setq read-process-output-max (* 2 1024 1024))
        (setq gc-cons-threshold (* 2 800000)))
+
+     (with-eval-after-load 'lsp-mode
+       (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\.venv\\'")
+       (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\.cache\\'")
+       (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\.poetry\\'")
+       (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\.metaflow\\'")
+       (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\.local\\'"))
    #+end_src
 
 Enables "pop-up's" with additional information about
