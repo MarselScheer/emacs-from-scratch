@@ -171,6 +171,7 @@ various language servers for instance for python or R.
    #+begin_src emacs-lisp
      (use-package lsp-mode
        :commands (lsp lsp-deferred)
+       :hook (prog-mode . lsp-mode)
        :init (setq lsp-keymap-prefix "C-c l")
        :config
        (lsp-enable-which-key-integration t)
