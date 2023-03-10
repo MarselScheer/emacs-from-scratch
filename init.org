@@ -335,8 +335,9 @@ parent-commits from there on.
 ** debugging
    #+begin_src emacs-lisp
      (use-package dap-mode
-       :custom
-       (dap-auto-configure-features '(expressions)))
+       :config
+       (setq dap-auto-configure-features '(sessions locals expressions repl))
+       (dap-auto-configure-mode))
    #+end_src
 
 ** dockerfiles
@@ -383,6 +384,7 @@ parent-commits from there on.
        (evil-define-key 'normal 'python-mode-map (kbd "SPC r c") 'ms/py-execute-class)
        (evil-define-key 'normal 'python-mode-map (kbd "SPC r r") 'ms/py-execute-region)
        (setq py-split-window-on-execute nil))
+       (setq dap-python-debugger 'debugpy)
      (use-package lsp-pyright
        :ensure t
        :hook (python-mode . (lambda ()
