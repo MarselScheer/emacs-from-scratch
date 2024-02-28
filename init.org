@@ -172,18 +172,23 @@ various language servers for instance for python or R.
      (use-package lsp-mode
        :commands (lsp lsp-deferred)
        :hook (prog-mode . lsp-mode)
-       :init (setq lsp-keymap-prefix "C-c l")
+       :init
+       (setq lsp-keymap-prefix "C-c l")
+       (setq xref-auto-jump-to-first-definition nil) ;; necessary in older emacs for "find-definition"-functionality
        :config
        (lsp-enable-which-key-integration t)
        (setq read-process-output-max (* 2 1024 1024))
-       (setq gc-cons-threshold (* 2 800000)))
-
-     (with-eval-after-load 'lsp-mode
+       (setq gc-cons-threshold (* 2 800000))
+       (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\venv\\'")
        (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\.venv\\'")
        (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\.cache\\'")
        (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\.poetry\\'")
        (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\.metaflow\\'")
        (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\.local\\'"))
+
+     (define-key evil-motion-state-map (kbd "SPC l d") 'lsp-describe-thing-at-point)
+     (define-key evil-motion-state-map (kbd "SPC l r") 'lsp-rename)
+     (define-key evil-motion-state-map (kbd "SPC l f") 'lsp-find-definition)
    #+end_src
 
 Enables "pop-up's" with additional information about
@@ -337,6 +342,12 @@ Visible query-replace
    #+begin_src emacs-lisp
      (use-package anzu
        :config (global-anzu-mode +1))
+   #+end_src
+** yaml
+
+   #+begin_src emacs-lisp
+     (use-package yaml-mode
+       :config (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode)))
    #+end_src
 
 * languages
