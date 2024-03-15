@@ -20,7 +20,28 @@ Easier way of installing and configuring packages.
      (unless (package-installed-p 'use-package)
        (package-install 'use-package))
      (require 'use-package)
-     (setq use-package-always-ensure t)
+     (setq straight-use-package-by-default t)
+   #+end_src
+** straight
+
+
+   #+begin_src emacs-lisp
+     ;; instructions from the straight README
+     (defvar bootstrap-version)
+     (let ((bootstrap-file
+	    (expand-file-name
+	     "straight/repos/straight.el/bootstrap.el"
+	     (or (bound-and-true-p straight-base-dir)
+		 user-emacs-directory)))
+	   (bootstrap-version 7))
+       (unless (file-exists-p bootstrap-file)
+	 (with-current-buffer
+	     (url-retrieve-synchronously
+	      "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+	      'silent 'inhibit-cookies)
+	   (goto-char (point-max))
+	   (eval-print-last-sexp)))
+       (load bootstrap-file nil 'nomessage))
    #+end_src
 ** org
    #+begin_src emacs-lisp
@@ -366,6 +387,22 @@ Visible query-replace
      (use-package goto-last-change)
    #+end_src
 
+** gptel
+
+   #+begin_src emacs-lisp
+     (use-package gptel
+       :straight (gptel :type git :host github :repo "karthink/gptel" :commit 199595b)
+       :config
+       (setq-default
+	gptel-model "codellama:7b"
+	gptel-backend (gptel-make-ollama "Ollama"
+					 :host "ollama:11434"
+					 :stream t
+					 :models '("codellama:7b")))
+       (setq gptel-log-level 'debug)
+       )
+     (global-set-key (kbd "C-c <RET>") 'gptel-send)
+   #+end_src
 * languages
 ** debugging
    #+begin_src emacs-lisp
