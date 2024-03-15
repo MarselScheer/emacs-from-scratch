@@ -189,6 +189,7 @@ various language servers for instance for python or R.
      (define-key evil-motion-state-map (kbd "SPC l d") 'lsp-describe-thing-at-point)
      (define-key evil-motion-state-map (kbd "SPC l r") 'lsp-rename)
      (define-key evil-motion-state-map (kbd "SPC l f") 'lsp-find-definition)
+     (define-key evil-motion-state-map (kbd "SPC l c") 'comment-or-uncomment-region)
    #+end_src
 
 Enables "pop-up's" with additional information about
@@ -348,6 +349,16 @@ Visible query-replace
    #+begin_src emacs-lisp
      (use-package yaml-mode
        :config (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode)))
+   #+end_src
+** denote
+
+   #+begin_src emacs-lisp
+     (use-package denote
+       :config
+       (setq denote-journal-extras-title-format 'year-month-day)
+       (evil-define-key 'normal 'python-mode-map (kbd "SPC j") 'denote-journal-extras-new-or-existing-entry))
+     (require 'denote-journal-extras)
+
    #+end_src
 
 * languages
