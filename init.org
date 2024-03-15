@@ -360,6 +360,11 @@ Visible query-replace
      (require 'denote-journal-extras)
 
    #+end_src
+** goto-last-change
+
+   #+begin_src emacs-lisp
+     (use-package goto-last-change)
+   #+end_src
 
 * languages
 ** debugging
