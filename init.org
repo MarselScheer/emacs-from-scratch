@@ -403,6 +403,32 @@ Visible query-replace
        )
      (global-set-key (kbd "C-c <RET>") 'gptel-send)
    #+end_src
+
+** llm-functions
+   #+begin_src emacs-lisp
+     (defun ollama-send-text-to-buffer (text)
+       "Send TEXT to a buffer with the name BUFFER-NAME."
+       (let ((curl-command (format "curl -s -X POST http://ollama:11434/api/generate -d '{ \"model\": \"codellama:7b\",\"prompt\": \"%s. only code\", \"stream\": false }' " text)))
+         (with-current-buffer (get-buffer-create "curl-llm-out")
+           (erase-buffer)
+           (insert (shell-command-to-string curl-command)))))
+
+     (defun ollama-extract-json-response ()
+       "Extract the 'response' field from a JSON buffer and save it to a new buffer."
+       (with-current-buffer  (get-buffer "curl-llm-out")
+         (let* ((json-string (buffer-string))
+     	   (json-data (json-read-from-string json-string))
+     	   (response (cdr (assoc 'response json-data))))
+           (concat "---------------------llm-start---------------------\n" response "\n---------------------llm-end---------------------")
+           )))
+
+     (defun llm (text)
+       (interactive "sOllama: ")
+       (ollama-send-text-to-buffer text)
+       (let ((response (ollama-extract-json-response)))
+         (insert response))
+       )
+   #+end_src
 * languages
 ** debugging
    #+begin_src emacs-lisp
