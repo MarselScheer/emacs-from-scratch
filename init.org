@@ -406,28 +406,34 @@ Visible query-replace
 
 ** llm-functions
    #+begin_src emacs-lisp
-     (defun ollama-send-text-to-buffer (text)
+     (defun ollama-only-code-curl-to-buffer (text)
        "Send TEXT to a buffer with the name BUFFER-NAME."
-       (let ((curl-command (format "curl -s -X POST http://ollama:11434/api/generate -d '{ \"model\": \"codellama:7b\",\"prompt\": \"%s. only code\", \"stream\": false }' " text)))
+       (let ((curl-command (format "curl -s -X POST http://ollama:11434/api/generate -d '{ \"model\": \"codellama:7b\",\"prompt\": \"%s. only code\", \"stream\": false }' " (replace-regexp-in-string "\n" " " text))))
          (with-current-buffer (get-buffer-create "curl-llm-out")
            (erase-buffer)
            (insert (shell-command-to-string curl-command)))))
 
-     (defun ollama-extract-json-response ()
+     (defun extract-json-response ()
        "Extract the 'response' field from a JSON buffer and save it to a new buffer."
        (with-current-buffer  (get-buffer "curl-llm-out")
          (let* ((json-string (buffer-string))
      	   (json-data (json-read-from-string json-string))
      	   (response (cdr (assoc 'response json-data))))
-           (concat "---------------------llm-start---------------------\n" response "\n---------------------llm-end---------------------")
+           (concat "\n---------------------llm-start---------------------\n" response "\n---------------------llm-end---------------------\n")
            )))
 
-     (defun llm (text)
+     (defun llm-minibuffer (text)
        (interactive "sOllama: ")
-       (ollama-send-text-to-buffer text)
-       (let ((response (ollama-extract-json-response)))
+       (ollama-only-code-curl-to-buffer text)
+       (let ((response (extract-json-response)))
          (insert response))
        )
+
+     (defun llm-only-code ()
+       "Returns the text selected by a region."
+       (interactive)
+       (let ((region (buffer-substring (region-beginning) (region-end))))
+         (llm-minibuffer region)))
    #+end_src
 * languages
 ** debugging
