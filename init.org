@@ -377,6 +377,7 @@ Visible query-replace
      (use-package denote
        :config
        (setq denote-journal-extras-title-format 'year-month-day)
+       (setq denote-directory "~/docker_fs/repos/orgfiles/")
        (evil-define-key 'normal 'python-mode-map (kbd "SPC j") 'denote-journal-extras-new-or-existing-entry))
      (require 'denote-journal-extras)
 
