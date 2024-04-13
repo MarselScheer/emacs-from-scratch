@@ -230,13 +230,14 @@ Online linting of source code
 Text completion 
 ** company-mode
    #+begin_src emacs-lisp
-     (use-package company
-       :after lsp-mode
-       :hook (lsp-mode . company-mode)
-       :custom 
-       (company-minimum-prefix-length 1)
-       (company-show-numbers t)
-       (company-idle-delay 0.0))
+        (use-package company
+          :after lsp-mode
+          :hook (lsp-mode . company-mode)
+          :custom
+          (company-minimum-prefix-length 1)
+          (company-show-numbers t)
+          (company-frontends '(company-pseudo-tooltip-frontend company-preview-frontend))
+          (company-idle-delay 0.0))
    #+end_src
 
 ** prescient
@@ -672,6 +673,7 @@ Add additional UI-info
      (column-number-mode)
      (global-display-line-numbers-mode t)
      (setq display-line-numbers-type 'relative)
+     (savehist-mode 1)
    #+end_src
 
 General key bindings. Copied from https://github.com/emacs-evil/evil-collection
