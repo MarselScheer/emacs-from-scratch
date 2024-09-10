@@ -100,8 +100,10 @@
        (corfu-auto t)                 ;; Enable auto completion
        (corfu-auto-prefix 1)
        (corfu-auto-delay 0.0)
+       :hook (eshell-mode . (lambda ()
+     			 (keymap-set corfu-map "RET" #'corfu-send)))
        :bind (:map corfu-map
-     	      ("M-SPC" . corfu-insert-separator))
+     	      ("ö" . corfu-insert-separator))
        :init
        (global-corfu-mode))
 
