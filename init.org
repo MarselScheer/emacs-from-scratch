@@ -79,7 +79,11 @@
    #+begin_src emacs-lisp
      (use-package vertico
        :init
-       (vertico-mode))
+       (vertico-mode)
+       :config
+       (keymap-set vertico-map "C-f" #'vertico-scroll-up)
+       (keymap-set vertico-map "C-b" #'vertico-scroll-down)
+       (setq vertico-cycle t))
    #+end_src
 
 ** marginali (minibuffer)
