@@ -101,7 +101,8 @@
        ;; Optional customizations
        :custom
        (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-       (corfu-auto t)                 ;; Enable auto completion
+       (corfu-auto nil)               ;; Disable auto completion because typing fast seems to collide with that
+                                      ;; because sometimes the whole file get manipulated?!?!
        (corfu-auto-prefix 1)
        (corfu-auto-delay 0.0)
        :hook (eshell-mode . (lambda ()
