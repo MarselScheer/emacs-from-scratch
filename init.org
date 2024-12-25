@@ -488,6 +488,51 @@ of a 'indentation-level' the cursor is in.
        (let ((region (buffer-substring (region-beginning) (region-end))))
          (llm-minibuffer region)))
    #+end_src
+** undo-tree
+
+   #+begin_src emacs-lisp
+     (use-package undo-tree
+       :config (global-undo-tree-mode))
+   #+end_src
+
+** expand-region
+
+   #+begin_src emacs-lisp
+     (use-package expand-region)
+     (define-key evil-motion-state-map (kbd "e") 'er/expand-region)
+   #+end_src
+
+** embark
+
+   #+begin_src emacs-lisp
+     (use-package embark
+       :bind ("C-." . embark-act))
+     (use-package embark-consult)
+   #+end_src
+
+** evil-surround
+
+   #+begin_src emacs-lisp
+     (use-package evil-surround
+       :config (global-evil-surround-mode 1))
+   #+end_src
+
+** evil-snipe
+
+   #+begin_src emacs-lisp
+     (use-package evil-snipe
+       :config (evil-snipe-mode))
+   #+end_src
+
+** evil-visualstar
+
+   #+begin_src emacs-lisp
+     (use-package evil-visualstar
+       :config
+       (global-evil-visualstar-mode)
+       (setq evil-visualstar/persistent 1))
+   #+end_src
+
 * languages
 ** debugging (deactivated)
    # #+begin_src emacs-lisp
