@@ -2,29 +2,7 @@
 #+PROPERTY: header-args:emacs-lisp :tangle init.el
 
 * packages
-** use-package 
-
-Easier way of installing and configuring packages.
-
-   #+begin_src emacs-lisp
-     (require 'package)
-     (setq package-archives '(("melpa" . "https://melpa.org/packages/")
-			      ("org" . "https://orgmode.org/elpa/")
-			      ("elpa" . "https://elpa.gnu.org/packages/")))
-     (package-initialize)
-     ;; only necessary during the very first start of emacs when
-     ;; there is no archive at all
-     (unless package-archive-contents
-       (package-refresh-contents))
-
-     (unless (package-installed-p 'use-package)
-       (package-install 'use-package))
-     (require 'use-package)
-     (setq straight-use-package-by-default t)
-   #+end_src
 ** straight
-
-
    #+begin_src emacs-lisp
      ;; instructions from the straight README
      (defvar bootstrap-version)
@@ -42,96 +20,167 @@ Easier way of installing and configuring packages.
 	   (goto-char (point-max))
 	   (eval-print-last-sexp)))
        (load bootstrap-file nil 'nomessage))
+
+     (setq straight-use-package-by-default t)
+     (straight-use-package 'use-package)
    #+end_src
 ** org
    #+begin_src emacs-lisp
      (defun ms/org-mode-setup()
        (org-mode-indent))
+
      (use-package org
-       :hook (org-mode . ms/org-mode-setup))
+       :hook (org-mode . ms/org-mode-setup)
+       :config
+       ;; timestamp and note for closing a todo
+       (setq org-log-done 'note))
    #+end_src
 
-** dired
+** dired (deactivated)
 
-   With two dired-buffer copy will by default guess that we
-   want to copy to the other buffer.
-   #+begin_src emacs-lisp
-     (defun ms/dired-mode-setup()
-       (setq dired-dwim-target t))
-     (add-hook 'dired-mode-hook 'ms/dired-mode-setup)
-   #+end_src
+   # With two dired-buffer copy will by default guess that we
+   # want to copy to the other buffer.
+   # #+begin_src emacs-lisp
+   #   (defun ms/dired-mode-setup()
+   #     (setq dired-dwim-target t))
+   #   (add-hook 'dired-mode-hook 'ms/dired-mode-setup)
+   # #+end_src
    
-** evil 
-
-Enables vim-keys!!!
+** evil (vim-keys)
 
    #+begin_src emacs-lisp
      (use-package evil
        :init
+       ;; needed by evil-collection
        (setq evil-want-integration t)
        (setq evil-want-keybinding nil)
        :config
-       (evil-mode 1)
-       (define-key evil-motion-state-map " " nil))
+       ;; otherwise SPC SPC will not bring up M-x if for instance
+       ;; a region is highlighted
+       (define-key evil-motion-state-map " " nil)
+       (evil-mode 1))
 
+     ;; need to also have movement keys hjkl in some other packages like magit
      (use-package evil-collection
        :after evil
        :ensure t
        :config
        (evil-collection-init))
-   #+end_src
 
-Prefer to use 'kj' to go back to normal mode
-   #+begin_src emacs-lisp
+     ;; Prefer to use 'kj' to go back to normal mode
      (use-package evil-escape
        :config
        (evil-escape-mode)
        (setq-default evil-escape-key-sequence "kj"))
    #+end_src
 
-** org
+** vertico (minibuffer)
 
    #+begin_src emacs-lisp
-     (use-package org
-       :config
-       ;; timestamp and note for closing a todo
-       (setq org-log-done 'note))
-   #+end_src
-
-** ivy
-
-Improve search functionalities in buffers
-   #+begin_src emacs-lisp
-     (use-package swiper
-       :bind 
-       ("C-s" . swiper))
-   #+end_src
-
-Fuzzy search for commands and files in minibuffer
-   #+begin_src emacs-lisp
-     (use-package ivy
-       :config
-       (setq ivy-count-format "(%d/%d)")
-       (ivy-mode 1))
-   #+End_src
-
-provides enhanced versions of common emacs commands
-   #+begin_src emacs-lisp
-     (use-package counsel
-       :bind (
-	      ("M-x" . counsel-M-x)
-	      ("C-h f" . counsel-describe-function)
-	      ("C-h v" . counsel-describe-variable)))
-   #+End_src
-   
-Shows shortcuts behind commands and additional
-descriptive text in minibuffer
-   #+begin_src emacs-lisp
-     (use-package ivy-rich
+     (use-package vertico
        :init
-       (ivy-rich-mode 1))
-   #+End_src
-** which-key
+       (vertico-mode)
+       :config
+       (keymap-set vertico-map "C-f" #'vertico-scroll-up)
+       (keymap-set vertico-map "C-b" #'vertico-scroll-down)
+       (setq vertico-cycle t))
+   #+end_src
+
+** marginali (minibuffer)
+
+   #+begin_src emacs-lisp
+     (use-package marginalia
+       :init
+       (marginalia-mode))
+   #+end_src
+
+** corfu (completion)
+
+   #+begin_src emacs-lisp
+     (use-package corfu
+       ;; Optional customizations
+       :custom
+       (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+       (corfu-auto nil)               ;; Disable auto completion because typing fast seems to collide with that
+                                      ;; because sometimes the whole file get manipulated?!?!
+       (corfu-auto-prefix 1)
+       (corfu-auto-delay 0.0)
+       :hook (eshell-mode . (lambda ()
+     			 (keymap-set corfu-map "RET" #'corfu-send)))
+       :bind (:map corfu-map
+     	      ("ö" . corfu-insert-separator))
+       :init
+       (global-corfu-mode))
+
+     (use-package corfu-terminal
+       :unless (display-graphic-p)
+       :config
+       (corfu-terminal-mode +1))
+
+     (use-package emacs
+       :custom
+       ;; TAB cycle if there are only few candidates
+       ;; (completion-cycle-threshold 3)
+       ;; Enable indentation+completion using the TAB key.
+       ;; `completion-at-point' is often bound to M-TAB.
+       (tab-always-indent 'complete)
+
+       ;; ;; Emacs 28 and newer: Hide commands in M-x which do not apply to the current
+       ;; ;; mode.  Corfu commands are hidden, since they are not used via M-x. This
+       ;; ;; setting is useful beyond Corfu.
+       (read-extended-command-predicate #'command-completion-default-include-p))
+   #+end_src
+** orderless (filter results)
+
+   #+begin_src emacs-lisp
+     (use-package orderless
+       :custom
+       (completion-styles '(orderless basic)))
+   #+end_src
+** consult (preview buffer, search, ...)
+
+   #+begin_src emacs-lisp
+     (use-package consult
+       :bind (("C-s" . consult-line) ;; search
+	      ("C-x b" . consult-buffer)))
+
+     (define-key evil-motion-state-map (kbd "SPC p s r") 'consult-ripgrep)
+   #+end_src
+
+** ivy (deactivated use vertico, marginalia, orderless and consult)
+
+# Improve search functionalities in buffers
+#    #+begin_src emacs-lisp
+#      (use-package swiper
+#        :bind 
+#        ("C-s" . swiper))
+#    #+end_src
+
+# Fuzzy search for commands and files in minibuffer
+#    #+begin_src emacs-lisp
+#      (use-package ivy
+#        :config
+#        (setq ivy-count-format "(%d/%d)")
+#        (ivy-mode 1))
+#    #+End_src
+
+# provides enhanced versions of common emacs commands
+#    #+begin_src emacs-lisp
+#      (use-package counsel
+#        :bind (
+# 	      ("M-x" . counsel-M-x)
+# 	      ("C-h f" . counsel-describe-function)
+# 	      ("C-h v" . counsel-describe-variable)))
+#    #+End_src
+   
+# Shows shortcuts behind commands and additional
+# descriptive text in minibuffer
+#    #+begin_src emacs-lisp
+#      (use-package ivy-rich
+#        :init
+#        (ivy-rich-mode 1))
+#    #+End_src
+** which-key (minibuffer incomplete commands)
 
 Shows which keys are possible for incomplete entered
 commands
@@ -141,25 +190,24 @@ commands
        (which-key-mode))
    #+end_src
 
-** rainbow-delimiters
+** rainbow-delimiters (deactivated)
 
-Coloring of parentheses, brackets and braces for different
-depth levels.
-   #+begin_src emacs-lisp
-     (use-package rainbow-delimiters
-       :hook (prog-mode . rainbow-delimiters-mode))
-   #+end_src
+# Coloring of parentheses, brackets and braces for different
+# depth levels.
+#    #+begin_src emacs-lisp
+#      (use-package rainbow-delimiters
+#        :hook (prog-mode . rainbow-delimiters-mode))
+#    #+end_src
 
-** helpful
+** helpful (more elisp help information)
 
-Elisp help pages contain additional information
    #+begin_src emacs-lisp
      (use-package helpful
        :custom (counsel-describe-function-function #'helpful-callable)
        :bind ([remap describe-function] . #'helpful-callable))
    #+end_src
-
-** projectile
+   
+** projectile (Group buffer, files by project)
 
 Keeps track of projects and its files and provide functionalities
 like searching through all files.
@@ -170,32 +218,56 @@ like searching through all files.
    #+end_src
 
 
-provides enhanced versions of common projectile commands like
-"jump to file"
-   #+begin_src emacs-lisp
-     (use-package counsel-projectile
-       :config (counsel-projectile-mode))
-   #+end_src
+# provides enhanced versions of common projectile commands like
+# "jump to file"
+#    #+begin_src emacs-lisp
+#      (use-package counsel-projectile
+#        :config (counsel-projectile-mode))
+#    #+end_src
 
-** magit
-
-A git-client
+** git
+*** magit (client)
    #+begin_src emacs-lisp
      (use-package magit)
      (define-key evil-motion-state-map (kbd "SPC g g") 'magit-status)
    #+end_src
+*** diff-hl
+
+Highlights which part differ from HEAD.
+
+   #+begin_src emacs-lisp
+     (use-package diff-hl
+       :config (global-diff-hl-mode))
+   #+end_src
   
-** lsp
+*** commit-messages
+
+Allows to show the commit-message corresponding to the
+line the cursor is in as a popup and also show the
+parent-commits from there on.
+
+   #+begin_src emacs-lisp
+     (use-package git-messenger
+       :config (setq git-messenger:show-detail t))
+   #+end_src
+
+** lsp (ide-functionality)
 
 Language server protocol client allows to connect to 
 various language servers for instance for python or R.
    #+begin_src emacs-lisp
      (use-package lsp-mode
-       :commands (lsp lsp-deferred)
-       :hook (prog-mode . lsp-mode)
+       ;; code also comes from https://github.com/minad/corfu/wiki#basic-example-configuration-with-orderless
+       :custom
+       (lsp-completion-provider :none) ;; we use Corfu!
        :init
        (setq lsp-keymap-prefix "C-c l")
        (setq xref-auto-jump-to-first-definition nil) ;; necessary in older emacs for "find-definition"-functionality
+       (defun my/lsp-mode-setup-completion ()
+	 (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+	       '(orderless))) ;; Configure orderless
+       :hook
+       (lsp-completion-mode . my/lsp-mode-setup-completion)
        :config
        (lsp-enable-which-key-integration t)
        (setq read-process-output-max (* 2 1024 1024))
@@ -211,97 +283,98 @@ various language servers for instance for python or R.
      (define-key evil-motion-state-map (kbd "SPC l r") 'lsp-rename)
      (define-key evil-motion-state-map (kbd "SPC l f") 'lsp-find-definition)
      (define-key evil-motion-state-map (kbd "SPC l c") 'comment-or-uncomment-region)
-   #+end_src
 
-Enables "pop-up's" with additional information about
-the current symbol or documentation for functions, etc.
-   #+begin_src emacs-lisp
+     ;; Enables "pop-up's" with additional information about
+     ;; the current symbol or documentation for functions, etc.
      (use-package lsp-ui
        :hook (lsp-mode . lsp-ui-mode))
+
+     (use-package lsp-pyright
+       :ensure t
+       :hook (python-mode . (lambda ()
+			      (require 'lsp-pyright)
+			      (lsp))))  ; or lsp-deferred
    #+end_src
 
-** flycheck
+** flycheck (deactivated)
 
-Online linting of source code
-   #+begin_src emacs-lisp
-     (use-package flycheck)
-   #+end_src
+# Online linting of source code
+#    #+begin_src emacs-lisp
+#      (use-package flycheck)
+#    #+end_src
 
 Text completion 
-** company-mode
-   #+begin_src emacs-lisp
-        (use-package company
-          :after lsp-mode
-          :hook (lsp-mode . company-mode)
-          :custom
-          (company-minimum-prefix-length 1)
-          (company-show-numbers t)
-          (company-frontends '(company-pseudo-tooltip-frontend company-preview-frontend))
-          (company-idle-delay 0.0))
-   #+end_src
+# ** company-mode (deactivated use vertico and orderless)
+#    #+begin_src emacs-lisp
+#         (use-package company
+#           :after lsp-mode
+#           :hook (lsp-mode . company-mode)
+#           :custom
+#           (company-minimum-prefix-length 1)
+#           (company-show-numbers t)
+#           (company-frontends '(company-pseudo-tooltip-frontend company-preview-frontend))
+#           (company-idle-delay 0.0))
+#    #+end_src
 
-** prescient
+** prescient (deactivated)
 
-Sorts commands based on frequence of usage
-   #+begin_src emacs-lisp
-     (use-package ivy-prescient
-       :after counsel
-       :config (ivy-prescient-mode))
-   #+end_src
+# Sorts commands based on frequence of usage
+#    #+begin_src emacs-lisp
+#      (use-package ivy-prescient
+#        :after counsel
+#        :config (ivy-prescient-mode))
+#    #+end_src
 
-** avy/ace-jump
+** ace-jump
 
 Jump around by specifying a sequence of chars (avy) or
 first char of a word (ace-jump)
    #+begin_src emacs-lisp
-     ;; (use-package avy
-     ;;   :config
-     ;;   (define-key evil-motion-state-map (kbd "SPC s") 'avy-goto-char-timer))
      (use-package ace-jump-mode
        :config
        (define-key evil-motion-state-map (kbd "SPC s") 'ace-jump-word-mode))
    #+end_src
 
-** winner
+** winner (deactivated)
 
-Switch through layouts from the history
-   #+begin_src emacs-lisp
-     (use-package winner
-       :config (winner-mode)
-       :bind (
-	      :map evil-window-map
-	      ("p" . winner-undo)
-	      ("n" . winner-redo)))
-   #+end_src
+# Switch through layouts from the history
+#    #+begin_src emacs-lisp
+#      (use-package winner
+#        :config (winner-mode)
+#        :bind (
+# 	      :map evil-window-map
+# 	      ("p" . winner-undo)
+# 	      ("n" . winner-redo)))
+#    #+end_src
 
-** yasnippet
+** yasnippet (deactivated)
 
-Provides snippet functionality
-   #+begin_src emacs-lisp
-     (use-package yasnippet
-       :config
-       (yas-reload-all)
-       :hook
-       (python-mode . yas-minor-mode)
-       (ess-mode . yas-minor-mode)
-       (org-mode . yas-minor-mode))
-   #+end_src
+# Provides snippet functionality
+#    #+begin_src emacs-lisp
+#      (use-package yasnippet
+#        :config
+#        (yas-reload-all)
+#        :hook
+#        (python-mode . yas-minor-mode)
+#        (ess-mode . yas-minor-mode)
+#        (org-mode . yas-minor-mode))
+#    #+end_src
 
 
-Various snippets
-   #+begin_src emacs-lisp
-     (use-package yasnippet-snippets)
-   #+end_src
-** symon
+# Various snippets
+#    #+begin_src emacs-lisp
+#      (use-package yasnippet-snippets)
+#    #+end_src
+** symon (deactivated)
 
-Systemmonitor in the minibuffer
+# Systemmonitor in the minibuffer
 
-   #+begin_src emacs-lisp
-     (use-package symon
-       :config
-       (setq symon-delay 5)
-       (symon-mode))
-   #+end_src
+#    #+begin_src emacs-lisp
+#      (use-package symon
+#        :config
+#        (setq symon-delay 5)
+#        (symon-mode))
+#    #+end_src
 
 ** beacon
 
@@ -324,50 +397,28 @@ of a 'indentation-level' the cursor is in.
        :config (indent-guide-global-mode))
    #+end_src
 
-** git
-*** diff-hl
+** docker (deactivated)
+   # #+begin_src emacs-lisp
+   #   (use-package docker
+   #     :ensure t
+   #     :bind ("C-c d" . docker)
+   #     :config (setq docker-run-as-root t))
+   # #+end_src
 
-Highlights which part differ from HEAD.
-
-   #+begin_src emacs-lisp
-     (use-package diff-hl
-       :config (global-diff-hl-mode))
-   #+end_src
-
-** git-commit-messages
-
-Allows to show the commit-message corresponding to the
-line the cursor is in as a popup and also show the
-parent-commits from there on.
-
-   #+begin_src emacs-lisp
-     (use-package git-messenger
-       :config (setq git-messenger:show-detail t))
-   #+end_src
-
-** docker
-   #+begin_src emacs-lisp
-     (use-package docker
-       :ensure t
-       :bind ("C-c d" . docker)
-       :config (setq docker-run-as-root t))
-   #+end_src
-
-** format-all
+** format-all (deactivated)
    
-   #+begin_src emacs-lisp
-     (use-package format-all
-       :config (add-hook 'prog-mode-hook 'format-all-mode))
-   #+end_src
-** anzu
+#    #+begin_src emacs-lisp
+#      (use-package format-all
+#        :config (add-hook 'prog-mode-hook 'format-all-mode))
+#    #+end_src
+** anzu (deactivated)
 
-Visible query-replace
-   #+begin_src emacs-lisp
-     (use-package anzu
-       :config (global-anzu-mode +1))
-   #+end_src
+# Visible query-replace
+#    #+begin_src emacs-lisp
+#      (use-package anzu
+#        :config (global-anzu-mode +1))
+#    #+end_src
 ** yaml
-
    #+begin_src emacs-lisp
      (use-package yaml-mode
        :config (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode)))
@@ -389,22 +440,22 @@ Visible query-replace
      (use-package goto-last-change)
    #+end_src
 
-** gptel
+** gptel (deactivated)
 
-   #+begin_src emacs-lisp
-     (use-package gptel
-       :straight (gptel :type git :host github :repo "karthink/gptel" :commit 199595b)
-       :config
-       (setq-default
-	gptel-model "codellama:7b"
-	gptel-backend (gptel-make-ollama "Ollama"
-					 :host "ollama:11434"
-					 :stream t
-					 :models '("codellama:7b")))
-       (setq gptel-log-level 'debug)
-       )
-     (global-set-key (kbd "C-c <RET>") 'gptel-send)
-   #+end_src
+   # #+begin_src emacs-lisp
+   #   (use-package gptel
+   #     :straight (gptel :type git :host github :repo "karthink/gptel" :commit 199595b)
+   #     :config
+   #     (setq-default
+   # 	gptel-model "codellama:7b"
+   # 	gptel-backend (gptel-make-ollama "Ollama"
+   # 					 :host "ollama:11434"
+   # 					 :stream t
+   # 					 :models '("codellama:7b")))
+   #     (setq gptel-log-level 'debug)
+   #     )
+   #   (global-set-key (kbd "C-c <RET>") 'gptel-send)
+   # #+end_src
 
 ** llm-functions
    #+begin_src emacs-lisp
@@ -438,46 +489,48 @@ Visible query-replace
          (llm-minibuffer region)))
    #+end_src
 * languages
-** debugging
-   #+begin_src emacs-lisp
-     (use-package dap-mode
-       :config
-       (setq dap-auto-configure-features '(sessions locals expressions repl))
-       (dap-auto-configure-mode))
-   #+end_src
+** debugging (deactivated)
+   # #+begin_src emacs-lisp
+   #   (use-package dap-mode
+   #     :config
+   #     (setq dap-auto-configure-features '(sessions locals expressions repl))
+   #     (dap-auto-configure-mode))
+   # #+end_src
 
-** dockerfiles
-   #+begin_src emacs-lisp
-     (use-package dockerfile-mode
-       :config
-       (add-to-list 'auto-mode-alist '("Dockerfile\\'" . dockerfile-mode)))
-   #+end_src
+** dockerfiles (deactivated)
+   # #+begin_src emacs-lisp
+   #   (use-package dockerfile-mode
+   #     :config
+   #     (add-to-list 'auto-mode-alist '("Dockerfile\\'" . dockerfile-mode)))
+   # #+end_src
    
 ** python
+   # #+begin_src emacs-lisp
+   #   (defun ms/py-execute-buffer ()
+   #     "Saves projects and sends buffer"
+   #     (interactive)
+   #     (when (get-buffer "*Python*")
+   #       (let ((kill-buffer-query-functions nil))
+   #         (kill-buffer "*Python*")))
+   #     (projectile-save-project-buffers)
+   #     (py-execute-buffer)
+   #     (let ((my-window (get-buffer-window)))
+   #       (ivy--switch-buffer-other-window-action "*Python*")
+   #       (select-window my-window)))
+
+   #   (defun ms/py-execute-class ()
+   #     "Saves projects and sends class"
+   #     (interactive)
+   #     (projectile-save-project-buffers)
+   #     (py-execute-class))
+
+   #   (defun ms/py-execute-region (beg end)
+   #     "Saves projects and sends region"
+   #     (interactive "r")
+   #     (projectile-save-project-buffers)
+   #     (py-execute-region beg end))
+   # #+end_src
    #+begin_src emacs-lisp
-     (defun ms/py-execute-buffer ()
-       "Saves projects and sends buffer"
-       (interactive)
-       (when (get-buffer "*Python*")
-	 (let ((kill-buffer-query-functions nil))
-	   (kill-buffer "*Python*")))
-       (projectile-save-project-buffers)
-       (py-execute-buffer)
-       (let ((my-window (get-buffer-window)))
-	 (ivy--switch-buffer-other-window-action "*Python*")
-	 (select-window my-window)))
-
-     (defun ms/py-execute-class ()
-       "Saves projects and sends class"
-       (interactive)
-       (projectile-save-project-buffers)
-       (py-execute-class))
-
-     (defun ms/py-execute-region (beg end)
-       "Saves projects and sends region"
-       (interactive "r")
-       (projectile-save-project-buffers)
-       (py-execute-region beg end))
      (use-package python-black
        :hook (python-mode . python-black-on-save-mode))
    #+end_src
@@ -486,197 +539,165 @@ Visible query-replace
      (use-package python-mode
        :hook (python-mode . lsp-deferred)
        :config
-       (require 'dap-python)
+       ;; (require 'dap-python)
        (evil-define-key 'normal 'python-mode-map (kbd "SPC r i") 'py-switch-to-shell)
-       (evil-define-key 'normal 'python-mode-map (kbd "SPC r b") 'ms/py-execute-buffer)
-       (evil-define-key 'normal 'python-mode-map (kbd "SPC r c") 'ms/py-execute-class)
-       (evil-define-key 'normal 'python-mode-map (kbd "SPC r r") 'ms/py-execute-region)
+       ;; (evil-define-key 'normal 'python-mode-map (kbd "SPC r b") 'ms/py-execute-buffer)
+       ;; (evil-define-key 'normal 'python-mode-map (kbd "SPC r c") 'ms/py-execute-class)
+       ;; (evil-define-key 'normal 'python-mode-map (kbd "SPC r r") 'ms/py-execute-region)
        (setq py-split-window-on-execute nil))
-       (setq dap-python-debugger 'debugpy)
-     (use-package lsp-pyright
-       :ensure t
-       :hook (python-mode . (lambda ()
-                              (require 'lsp-pyright)
-                              (lsp))))  ; or lsp-deferred
+       ;; (setq dap-python-debugger 'debugpy)
    #+end_src
 
-** R 
+** R (deactivated)
 *** ess
-   #+begin_src emacs-lisp
-     (defun show-R-buffer ()
-       (switch-to-buffer-other-window
-	(buffer-name
-	 (car
-	  (seq-filter
-	   (lambda (b) (string-prefix-p "*R:" (buffer-name b)))
-	   (buffer-list)))))
-       (switch-to-buffer-other-window (other-buffer (current-buffer) 1)))
+   # #+begin_src emacs-lisp
+   #   (defun show-R-buffer ()
+   #     (switch-to-buffer-other-window
+   # 	(buffer-name
+   # 	 (car
+   # 	  (seq-filter
+   # 	   (lambda (b) (string-prefix-p "*R:" (buffer-name b)))
+   # 	   (buffer-list)))))
+   #     (switch-to-buffer-other-window (other-buffer (current-buffer) 1)))
 
-     (defun ess-pkgdown-site ()
-       "Interface to tinytest"
-       (interactive)
-       (projectile-save-project-buffers)
-       (ess-eval-linewise
-	"roxygen2::roxygenize(); options(pkgdown.internet = FALSE); pkgdown::build_site(preview = FALSE)"
-	"Build pkgdown site"))
+   #   (defun ess-pkgdown-site ()
+   #     "Interface to tinytest"
+   #     (interactive)
+   #     (projectile-save-project-buffers)
+   #     (ess-eval-linewise
+   # 	"roxygen2::roxygenize(); options(pkgdown.internet = FALSE); pkgdown::build_site(preview = FALSE)"
+   # 	"Build pkgdown site"))
 
-     (defun ess-pkgdown-articles ()
-       "Interface to tinytest"
-       (interactive)
-       (projectile-save-project-buffers)
-       (ess-eval-linewise
-	"roxygen2::roxygenize(); options(pkgdown.internet = FALSE); pkgdown::build_articles(preview = FALSE)"
-	"Build pkgdown articles"))
+   #   (defun ess-pkgdown-articles ()
+   #     "Interface to tinytest"
+   #     (interactive)
+   #     (projectile-save-project-buffers)
+   #     (ess-eval-linewise
+   # 	"roxygen2::roxygenize(); options(pkgdown.internet = FALSE); pkgdown::build_articles(preview = FALSE)"
+   # 	"Build pkgdown articles"))
 
-     (setq ms/default-test-file nil)
-     (setq ms/default-test-dir nil)
+   #   (setq ms/default-test-file nil)
+   #   (setq ms/default-test-dir nil)
 
-     (defun ess-r-tinytest-file (file)
-       "Interface to tinytest"
-       (interactive (list (read-file-name "Select test file:" ms/default-test-dir nil nil ms/default-test-file)))
-       (setq ms/default-test-dir (concat (f-dirname file) "/"))
-       (setq ms/default-test-file (f-filename file))
-       (projectile-save-project-buffers)
-       (ess-r-package-eval-linewise
-	(format "pkgload::load_all(); tinytest::run_test_file('%s')" file)
-	"Load package. Run test file"))
+   #   (defun ess-r-tinytest-file (file)
+   #     "Interface to tinytest"
+   #     (interactive (list (read-file-name "Select test file:" ms/default-test-dir nil nil ms/default-test-file)))
+   #     (setq ms/default-test-dir (concat (f-dirname file) "/"))
+   #     (setq ms/default-test-file (f-filename file))
+   #     (projectile-save-project-buffers)
+   #     (ess-r-package-eval-linewise
+   # 	(format "pkgload::load_all(); tinytest::run_test_file('%s')" file)
+   # 	"Load package. Run test file"))
 
-     (defun ess-r-tinytest ()
-       "Interface to tinytest"
-       (interactive)
-       (projectile-save-project-buffers)
-       (ess-r-package-eval-linewise
-	"pkgload::load_all(); tinytest::test_all()"
-	"Load package. Test with tinytest"))
+   #   (defun ess-r-tinytest ()
+   #     "Interface to tinytest"
+   #     (interactive)
+   #     (projectile-save-project-buffers)
+   #     (ess-r-package-eval-linewise
+   # 	"pkgload::load_all(); tinytest::test_all()"
+   # 	"Load package. Test with tinytest"))
 
-     (defun ess-print-at-point ()
-       "print of whats at point"
-       (interactive)
-       (let ((target (thing-at-point 'symbol)))
-	 (ess-eval-linewise
-	  (format "%s" target)
-	  (format "Print instance: %s" target)))
-       (show-R-buffer))
+   #   (defun ess-print-at-point ()
+   #     "print of whats at point"
+   #     (interactive)
+   #     (let ((target (thing-at-point 'symbol)))
+   # 	 (ess-eval-linewise
+   # 	  (format "%s" target)
+   # 	  (format "Print instance: %s" target)))
+   #     (show-R-buffer))
 
-     (defun ess-head-at-point ()
-       "prints head of whats at point"
-       (interactive)
-       (let ((target (thing-at-point 'symbol)))
-	 (ess-eval-linewise
-	  (format "head(%s)" target)
-	  (format "Head of instance: %s" target)))
-       (show-R-buffer))
+   #   (defun ess-head-at-point ()
+   #     "prints head of whats at point"
+   #     (interactive)
+   #     (let ((target (thing-at-point 'symbol)))
+   # 	 (ess-eval-linewise
+   # 	  (format "head(%s)" target)
+   # 	  (format "Head of instance: %s" target)))
+   #     (show-R-buffer))
 
-     (defun ess-tail-at-point ()
-       "prints tail of whats at point"
-       (interactive)
-       (let ((target (thing-at-point 'symbol)))
-	 (ess-eval-linewise
-	  (format "tail(%s)" target)
-	  (format "Tail of instance: %s" target))))
+   #   (defun ess-tail-at-point ()
+   #     "prints tail of whats at point"
+   #     (interactive)
+   #     (let ((target (thing-at-point 'symbol)))
+   # 	 (ess-eval-linewise
+   # 	  (format "tail(%s)" target)
+   # 	  (format "Tail of instance: %s" target))))
 
-     (defun drake-load-at-point ()
-       "load drake-target at point"
-       (interactive)
-       (let ((target (thing-at-point 'symbol)))
-	 (ess-eval-linewise
-	  (format "drake::loadd(%s)" target)
-	  (format "Load target: %s" target)))
-       (show-R-buffer))
+   #   (defun drake-load-at-point ()
+   #     "load drake-target at point"
+   #     (interactive)
+   #     (let ((target (thing-at-point 'symbol)))
+   # 	 (ess-eval-linewise
+   # 	  (format "drake::loadd(%s)" target)
+   # 	  (format "Load target: %s" target)))
+   #     (show-R-buffer))
 
-     (defun drake-load-at-point-and-print ()
-       "load drake-target at point and print"
-       (interactive)
-       (drake-load-at-point)
-       (ess-print-at-point)
-       (show-R-buffer))
+   #   (defun drake-load-at-point-and-print ()
+   #     "load drake-target at point and print"
+   #     (interactive)
+   #     (drake-load-at-point)
+   #     (ess-print-at-point)
+   #     (show-R-buffer))
 
-     (defun drake-load-at-point-and-head ()
-       "load drake-target at point and print head"
-       (interactive)
-       (drake-load-at-point)
-       (ess-head-at-point)
-       (show-R-buffer))
+   #   (defun drake-load-at-point-and-head ()
+   #     "load drake-target at point and print head"
+   #     (interactive)
+   #     (drake-load-at-point)
+   #     (ess-head-at-point)
+   #     (show-R-buffer))
 
-     (defun drake-prep-run ()
-       "prep drake run"
-       (interactive)
-       (projectile-save-project-buffers)
-       (ess-eval-linewise
-	"source('prep_drake_run.R')"
-	"Prepare next drake run")
-       (show-R-buffer))
+   #   (defun drake-prep-run ()
+   #     "prep drake run"
+   #     (interactive)
+   #     (projectile-save-project-buffers)
+   #     (ess-eval-linewise
+   # 	"source('prep_drake_run.R')"
+   # 	"Prepare next drake run")
+   #     (show-R-buffer))
 
-     (defun drake-exec-run ()
-       "execute drake run"
-       (interactive)
-       (projectile-save-project-buffers)
-       (ess-eval-linewise
-	"execute_plans(confirm = FALSE)"
-	"Execute drake run")
-       (show-R-buffer))
-   #+end_src
+   #   (defun drake-exec-run ()
+   #     "execute drake run"
+   #     (interactive)
+   #     (projectile-save-project-buffers)
+   #     (ess-eval-linewise
+   # 	"execute_plans(confirm = FALSE)"
+   # 	"Execute drake run")
+   #     (show-R-buffer))
+   # #+end_src
 
-   #+begin_src emacs-lisp
-     (use-package ess
-       :hook (ess-mode . lsp-deferred)
-       :config
-       (setq-default ess-style 'RStudio-)
-       (evil-define-key 'insert 'ess-r-mode-map (kbd "C-p") 'company-manual-begin)
-       (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC d p") 'drake-prep-run)
-       (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC d r") 'drake-exec-run)
-       (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC d l") 'drake-load-at-point)
-       (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r d a") 'ess-pkgdown-articles)
-       (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r d s") 'ess-pkgdown-site)
-       (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r b") 'ess-eval-buffer)
-       (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r s") 'ess-eval-buffer-from-beg-to-here)
-       (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r e") 'ess-eval-buffer-from-here-to-end)
-       (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r r") 'ess-eval-region-or-function-or-paragraph)
-       (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r k") 'ess-head-at-point)
-       (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r j") 'ess-tail-at-point)
-       (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r p") 'ess-print-at-point)
-       (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r t") 'ess-r-tinytest-file)
-       (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC p P") 'ess-r-tinytest)
-       (setq ess-eval-visibly 't))
-   #+end_src
+   # #+begin_src emacs-lisp
+   #   (use-package ess
+   #     :hook (ess-mode . lsp-deferred)
+   #     :config
+   #     (setq-default ess-style 'RStudio-)
+   #     (evil-define-key 'insert 'ess-r-mode-map (kbd "C-p") 'company-manual-begin)
+   #     (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC d p") 'drake-prep-run)
+   #     (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC d r") 'drake-exec-run)
+   #     (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC d l") 'drake-load-at-point)
+   #     (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r d a") 'ess-pkgdown-articles)
+   #     (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r d s") 'ess-pkgdown-site)
+   #     (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r b") 'ess-eval-buffer)
+   #     (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r s") 'ess-eval-buffer-from-beg-to-here)
+   #     (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r e") 'ess-eval-buffer-from-here-to-end)
+   #     (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r r") 'ess-eval-region-or-function-or-paragraph)
+   #     (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r k") 'ess-head-at-point)
+   #     (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r j") 'ess-tail-at-point)
+   #     (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r p") 'ess-print-at-point)
+   #     (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC r t") 'ess-r-tinytest-file)
+   #     (evil-define-key 'normal 'ess-r-mode-map (kbd "SPC p P") 'ess-r-tinytest)
+   #     (setq ess-eval-visibly 't))
+   # #+end_src
 
 *** poly-R-markdown
 
 Polymode for working with Rmd-files
 
-   #+begin_src emacs-lisp
-     (use-package poly-R
-       :ensure t)
-   #+end_src
+   # #+begin_src emacs-lisp
+   #   (use-package poly-R
+   #     :ensure t)
+   # #+end_src
 
-
-* ui
-** general
-
-Remove various UI-elements
-   #+begin_src emacs-lisp
-     (setq inhibit-startup-screen t)
-     (scroll-bar-mode -1)
-     (tool-bar-mode -1)
-     (menu-bar-mode -1)
-     (tooltip-mode -1)
-   #+end_src
-
-Show always end of compilation buffer or first error
-   #+begin_src emacs-lisp
-     (custom-set-variables
-      '(compilation-scroll-output 'first-error))
-   #+end_src
-
-Add additional UI-info
-   #+begin_src emacs-lisp
-     (column-number-mode)
-     (global-display-line-numbers-mode t)
-     (setq display-line-numbers-type 'relative)
-     (savehist-mode 1)
-   #+end_src
-
-General key bindings. Copied from https://github.com/emacs-evil/evil-collection
+* General key bindings. Copied from https://github.com/emacs-evil/evil-collection
    #+begin_src emacs-lisp
      (defvar my-intercept-mode-map (make-sparse-keymap)
        "High precedence keymap.")
@@ -694,21 +715,43 @@ General key bindings. Copied from https://github.com/emacs-evil/evil-collection
 	state))
 
      (evil-define-key 'normal my-intercept-mode-map
-       (kbd "SPC SPC") 'counsel-M-x)
+       (kbd "SPC SPC") 'execute-extended-command)
      (evil-define-key 'normal my-intercept-mode-map
        (kbd "SPC b f") 'find-file)
      (evil-define-key 'normal my-intercept-mode-map
-       (kbd "SPC b b") 'counsel-switch-buffer)
+       (kbd "SPC b b") 'consult-buffer)
      (evil-define-key 'normal my-intercept-mode-map
        (kbd "SPC b k") 'kill-buffer)
      (evil-define-key 'normal my-intercept-mode-map
-       (kbd "SPC b b") 'counsel-switch-buffer)
-     (evil-define-key 'normal my-intercept-mode-map
-       (kbd "SPC b b") 'counsel-switch-buffer)
-     (evil-define-key 'normal my-intercept-mode-map
-       (kbd "SPC b o") 'counsel-switch-buffer-other-window)
+       (kbd "SPC b o") 'consult-buffer-other-window)
      (evil-define-key 'normal my-intercept-mode-map
        (kbd "SPC w") 'evil-window-map)
+   #+end_src
+
+* ui
+** general
+
+*** Remove various UI-elements
+   #+begin_src emacs-lisp
+     (setq inhibit-startup-screen t)
+     (scroll-bar-mode -1)
+     (tool-bar-mode -1)
+     (menu-bar-mode -1)
+     (tooltip-mode -1)
+   #+end_src
+
+*** Show always end of compilation buffer or first error
+   #+begin_src emacs-lisp
+     (custom-set-variables
+      '(compilation-scroll-output 'first-error))
+   #+end_src
+
+*** Add additional UI-info
+   #+begin_src emacs-lisp
+     (column-number-mode)
+     (global-display-line-numbers-mode t)
+     (setq display-line-numbers-type 'relative)
+     (savehist-mode 1)
    #+end_src
 
 ** Compilation buffer
@@ -725,13 +768,14 @@ General key bindings. Copied from https://github.com/emacs-evil/evil-collection
      (load-theme 'doom-dracula t)
      ;; (use-package cyberpunk-theme)
      ;; (load-theme 'cyberpunk t)
+     ;; (consult-theme 'deeper-blue)
      (custom-set-faces
       '(ivy-current-match ((t (:extend t :background "gray10" :foreground "yellow" :box nil :weight bold)))))
    #+end_src
 
    #+begin_src emacs-lisp
-     (use-package doom-modeline
-      :init (doom-modeline-mode 0))
+     ;; (use-package doom-modeline
+     ;;  :init (doom-modeline-mode 0))
      (use-package telephone-line)
      (telephone-line-mode 1)
    #+end_src
