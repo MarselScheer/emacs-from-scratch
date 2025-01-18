@@ -492,7 +492,9 @@ of a 'indentation-level' the cursor is in.
 
    #+begin_src emacs-lisp
      (use-package undo-tree
-       :config (global-undo-tree-mode))
+       :config
+       (global-undo-tree-mode)
+       (setq undo-tree-auto-save-history nil))
    #+end_src
 
 ** expand-region
