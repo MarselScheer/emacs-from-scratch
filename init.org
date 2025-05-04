@@ -24,18 +24,6 @@
      (setq straight-use-package-by-default t)
      (straight-use-package 'use-package)
    #+end_src
-** org
-   #+begin_src emacs-lisp
-     (defun ms/org-mode-setup()
-       (org-mode-indent))
-
-     (use-package org
-       :hook (org-mode . ms/org-mode-setup)
-       :config
-       ;; timestamp and note for closing a todo
-       (setq org-log-done 'note))
-   #+end_src
-
 ** dired (deactivated)
 
    # With two dired-buffer copy will by default guess that we
@@ -72,6 +60,31 @@
        :config
        (evil-escape-mode)
        (setq-default evil-escape-key-sequence "kj"))
+   #+end_src
+
+** org
+   #+begin_src emacs-lisp
+     (use-package org
+       ;; :bind
+       ;; (:map org-agenda-mode-map
+       ;; 	("j" . org-agenda-next-line)
+       ;; 	("k" . org-agenda-previous-line))
+       :config
+       (setq org-agenda-files (directory-files "~/syncthing/orgfiles" 1 "org$"))
+       (setq org-log-done "time")
+       (setq org-todo-keywords '((sequence "TODO(t)" "CONT(c)" "WAIT(w)" "|" "DONE(d)" "ABORTED(a)")))
+       (setq org-log-note-headings '((done . "CLOSING NOTE %t")
+     				(state . "State %-12s from %-12S %t")
+     				;; (note . "Note taken on %t")
+     				(note . "%d")
+     				(reschedule . "Rescheduled from %S on %t")
+     				(delschedule . "Not scheduled, was %S on %t")
+     				(redeadline . "New deadline from %S on %t")
+     				(deldeadline . "Removed deadline, was %S on %t")
+     				(refile . "Refiled on %t")
+     				(clock-out . ""))))
+     (define-key evil-motion-state-map (kbd "SPC o a") 'org-agenda)
+     (define-key evil-motion-state-map (kbd "SPC o i") 'org-indent-mode)
    #+end_src
 
 ** vertico (minibuffer)
@@ -429,10 +442,7 @@ of a 'indentation-level' the cursor is in.
      (use-package denote
        :config
        (setq denote-journal-extras-title-format 'year-month-day)
-       (setq denote-directory "~/docker_fs/repos/orgfiles/")
-       (evil-define-key 'normal 'python-mode-map (kbd "SPC j") 'denote-journal-extras-new-or-existing-entry))
-     (require 'denote-journal-extras)
-
+       (setq denote-directory "~/syncthing/orgfiles"))
    #+end_src
 ** goto-last-change
 
@@ -440,22 +450,30 @@ of a 'indentation-level' the cursor is in.
      (use-package goto-last-change)
    #+end_src
 
-** gptel (deactivated)
+** gptel
 
-   # #+begin_src emacs-lisp
-   #   (use-package gptel
-   #     :straight (gptel :type git :host github :repo "karthink/gptel" :commit 199595b)
-   #     :config
-   #     (setq-default
-   # 	gptel-model "codellama:7b"
-   # 	gptel-backend (gptel-make-ollama "Ollama"
-   # 					 :host "ollama:11434"
-   # 					 :stream t
-   # 					 :models '("codellama:7b")))
-   #     (setq gptel-log-level 'debug)
-   #     )
-   #   (global-set-key (kbd "C-c <RET>") 'gptel-send)
-   # #+end_src
+   #+begin_src emacs-lisp
+     (use-package gptel
+       :config
+       ;; (setq gptel--debug t)
+       ;; (setq gptel-log-level 'debug)
+       (setq gptel-temperature 0.0)
+       (global-set-key (kbd "C-c <RET>") 'gptel-send)
+       (gptel-make-ollama "Ollama0"
+         :host "ollama:11434"
+         :stream t
+         :models '(gemma3:4b))
+       (gptel-make-ollama "Ollama1"
+         :host "ollama:11434"
+         :stream t
+         :models '(cogito:8b))
+       (setq
+        gptel-model 'codellama:7b
+        gptel-backend (gptel-make-ollama "Ollama2"
+     		   :host "localhost:11434"
+     		   :stream t
+     		   :models '(codellama:7b))))
+   #+end_src
 
 ** llm-functions
    #+begin_src emacs-lisp
@@ -488,6 +506,63 @@ of a 'indentation-level' the cursor is in.
        (let ((region (buffer-substring (region-beginning) (region-end))))
          (llm-minibuffer region)))
    #+end_src
+** undo-tree
+
+   #+begin_src emacs-lisp
+     (use-package undo-tree
+       :config
+       (global-undo-tree-mode)
+       (setq undo-tree-auto-save-history nil))
+   #+end_src
+
+** expand-region
+
+   #+begin_src emacs-lisp
+     (use-package expand-region)
+     (define-key evil-motion-state-map (kbd "e") 'er/expand-region)
+   #+end_src
+
+** embark
+
+   #+begin_src emacs-lisp
+     (use-package embark
+       :bind ("C-." . embark-act))
+     (use-package embark-consult)
+   #+end_src
+
+** evil-snipe
+
+   #+begin_src emacs-lisp
+     (use-package evil-snipe
+       :config (evil-snipe-mode))
+   #+end_src
+
+** evil-visualstar
+
+   #+begin_src emacs-lisp
+     (use-package evil-visualstar
+       :config
+       (global-evil-visualstar-mode)
+       (setq evil-visualstar/persistent 1))
+   #+end_src
+
+* own packages
+** time table
+#+begin_src emacs-lisp
+
+  (use-package time-table
+    :straight (time-table :type git :host github :repo "MarselScheer/time-table" :branch "time-table-buffer")
+    :custom
+    (time-table-work-hours 0)
+    (time-table-file "~/syncthing/orgfiles/tracked-times")
+    (time-table-project-names '("book" "kg" "time-table" "emacs" "backup" "end"))
+    (time-table-task-names '("code" "tex" "math" "end")))
+  (define-key evil-motion-state-map (kbd "SPC t t") 'time-table-track)
+  (define-key evil-motion-state-map (kbd "SPC t s") 'time-table-status)
+  (define-key evil-motion-state-map (kbd "SPC t S") 'time-table-summarize-projects-last-7-days)
+  (define-key evil-motion-state-map (kbd "SPC t b") 'time-table-find-tracking-file)
+  (define-key evil-motion-state-map (kbd "SPC t e") 'time-table-end-tracking)
+#+end_src
 * languages
 ** debugging (deactivated)
    # #+begin_src emacs-lisp
@@ -537,15 +612,16 @@ of a 'indentation-level' the cursor is in.
 
    #+begin_src emacs-lisp
      (use-package python-mode
-       :hook (python-mode . lsp-deferred)
-       :config
-       ;; (require 'dap-python)
-       (evil-define-key 'normal 'python-mode-map (kbd "SPC r i") 'py-switch-to-shell)
-       ;; (evil-define-key 'normal 'python-mode-map (kbd "SPC r b") 'ms/py-execute-buffer)
-       ;; (evil-define-key 'normal 'python-mode-map (kbd "SPC r c") 'ms/py-execute-class)
-       ;; (evil-define-key 'normal 'python-mode-map (kbd "SPC r r") 'ms/py-execute-region)
-       (setq py-split-window-on-execute nil))
-       ;; (setq dap-python-debugger 'debugpy)
+       :hook (python-mode . lsp-deferred))
+       ;; :config
+       ;; ;; (require 'dap-python)
+       ;; (evil-define-key 'normal 'python-mode-map (kbd "SPC r i") 'py-switch-to-shell)
+       ;; ;; (evil-define-key 'normal 'python-mode-map (kbd "SPC r b") 'ms/py-execute-buffer)
+       ;; ;; (evil-define-key 'normal 'python-mode-map (kbd "SPC r c") 'ms/py-execute-class)
+       ;; ;; (evil-define-key 'normal 'python-mode-map (kbd "SPC r r") 'ms/py-execute-region)
+       ;; (setq py-split-window-on-execute nil))
+       ;; ;; (setq dap-python-debugger 'debugpy)
+     ;; (define-key python-mode-map (kbd "TAB") 'completion-at-point)
    #+end_src
 
 ** R (deactivated)
@@ -730,7 +806,6 @@ Polymode for working with Rmd-files
 
 * ui
 ** general
-
 *** Remove various UI-elements
    #+begin_src emacs-lisp
      (setq inhibit-startup-screen t)
@@ -743,7 +818,12 @@ Polymode for working with Rmd-files
 *** Show always end of compilation buffer or first error
    #+begin_src emacs-lisp
      (custom-set-variables
-      '(compilation-scroll-output 'first-error))
+      ;; custom-set-variables was added by Custom.
+      ;; If you edit it by hand, you could mess it up, so be careful.
+      ;; Your init file should contain only one such instance.
+      ;; If there is more than one, they won't work right.
+      '(compilation-scroll-output 'first-error)
+      '(warning-suppress-log-types '((native-compiler))))
    #+end_src
 
 *** Add additional UI-info
@@ -770,6 +850,10 @@ Polymode for working with Rmd-files
      ;; (load-theme 'cyberpunk t)
      ;; (consult-theme 'deeper-blue)
      (custom-set-faces
+      ;; custom-set-faces was added by Custom.
+      ;; If you edit it by hand, you could mess it up, so be careful.
+      ;; Your init file should contain only one such instance.
+      ;; If there is more than one, they won't work right.
       '(ivy-current-match ((t (:extend t :background "gray10" :foreground "yellow" :box nil :weight bold)))))
    #+end_src
 
