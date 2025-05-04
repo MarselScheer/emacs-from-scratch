@@ -367,6 +367,3 @@
 ;;  :init (doom-modeline-mode 0))
 (use-package telephone-line)
 (telephone-line-mode 1)
-(use-package auctex)
-(global-set-key (kbd "M-h") 'hippie-expand)
-
