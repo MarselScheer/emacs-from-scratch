@@ -197,11 +197,30 @@
 (use-package denote
   :config
   (setq denote-journal-extras-title-format 'year-month-day)
-  (setq denote-directory "~/syncthing/orgfiles")
-  (evil-define-key 'normal 'python-mode-map (kbd "SPC j") 'denote-journal-extras-new-or-existing-entry))
-(require 'denote-journal-extras)
+  (setq denote-directory "~/syncthing/orgfiles"))
 
 (use-package goto-last-change)
+
+(use-package gptel
+  :config
+  ;; (setq gptel--debug t)
+  ;; (setq gptel-log-level 'debug)
+  (setq gptel-temperature 0.0)
+  (global-set-key (kbd "C-c <RET>") 'gptel-send)
+  (gptel-make-ollama "Ollama0"
+    :host "ollama:11434"
+    :stream t
+    :models '(gemma3:4b))
+  (gptel-make-ollama "Ollama1"
+    :host "ollama:11434"
+    :stream t
+    :models '(cogito:8b))
+  (setq
+   gptel-model 'codellama:7b
+   gptel-backend (gptel-make-ollama "Ollama2"
+		   :host "localhost:11434"
+		   :stream t
+		   :models '(codellama:7b))))
 
 (defun ollama-only-code-curl-to-buffer (text)
   "Send TEXT to a buffer with the name BUFFER-NAME."
@@ -244,9 +263,6 @@
   :bind ("C-." . embark-act))
 (use-package embark-consult)
 
-(use-package evil-surround 
-  :config (global-evil-surround-mode 1))
-
 (use-package evil-snipe
   :config (evil-snipe-mode))
 
@@ -255,19 +271,33 @@
   (global-evil-visualstar-mode)
   (setq evil-visualstar/persistent 1))
 
+(use-package time-table
+  :straight (time-table :type git :host github :repo "MarselScheer/time-table" :branch "time-table-buffer")
+  :custom
+  (time-table-work-hours 0)
+  (time-table-file "~/syncthing/orgfiles/tracked-times")
+  (time-table-project-names '("book" "kg" "time-table" "emacs" "backup" "end"))
+  (time-table-task-names '("code" "tex" "math" "end")))
+(define-key evil-motion-state-map (kbd "SPC t t") 'time-table-track)
+(define-key evil-motion-state-map (kbd "SPC t s") 'time-table-status)
+(define-key evil-motion-state-map (kbd "SPC t S") 'time-table-summarize-projects-last-7-days)
+(define-key evil-motion-state-map (kbd "SPC t b") 'time-table-find-tracking-file)
+(define-key evil-motion-state-map (kbd "SPC t e") 'time-table-end-tracking)
+
 (use-package python-black
   :hook (python-mode . python-black-on-save-mode))
 
 (use-package python-mode
-  :hook (python-mode . lsp-deferred)
-  :config
-  ;; (require 'dap-python)
-  (evil-define-key 'normal 'python-mode-map (kbd "SPC r i") 'py-switch-to-shell)
-  ;; (evil-define-key 'normal 'python-mode-map (kbd "SPC r b") 'ms/py-execute-buffer)
-  ;; (evil-define-key 'normal 'python-mode-map (kbd "SPC r c") 'ms/py-execute-class)
-  ;; (evil-define-key 'normal 'python-mode-map (kbd "SPC r r") 'ms/py-execute-region)
-  (setq py-split-window-on-execute nil))
-  ;; (setq dap-python-debugger 'debugpy)
+  :hook (python-mode . lsp-deferred))
+  ;; :config
+  ;; ;; (require 'dap-python)
+  ;; (evil-define-key 'normal 'python-mode-map (kbd "SPC r i") 'py-switch-to-shell)
+  ;; ;; (evil-define-key 'normal 'python-mode-map (kbd "SPC r b") 'ms/py-execute-buffer)
+  ;; ;; (evil-define-key 'normal 'python-mode-map (kbd "SPC r c") 'ms/py-execute-class)
+  ;; ;; (evil-define-key 'normal 'python-mode-map (kbd "SPC r r") 'ms/py-execute-region)
+  ;; (setq py-split-window-on-execute nil))
+  ;; ;; (setq dap-python-debugger 'debugpy)
+;; (define-key python-mode-map (kbd "TAB") 'completion-at-point)
 
 (defvar my-intercept-mode-map (make-sparse-keymap)
   "High precedence keymap.")
@@ -340,47 +370,3 @@
 (use-package auctex)
 (global-set-key (kbd "M-h") 'hippie-expand)
 
-(use-package gptel
-  :config
-  (setq gptel--debug t)
-  (setq gptel-log-level 'debug)
-  (setq gptel-temperature 0.0)
-  (global-set-key (kbd "C-c <RET>") 'gptel-send)
-  (setq
-   gptel-model 'codellama:7b
-   gptel-backend (gptel-make-ollama "Ollama"
-		   :host "localhost:11434"
-		   :stream t
-		   :models '(codellama:7b))))
-
-;; (use-package gptel
-;;   :config
-;;   (global-set-key (kbd "C-c <RET>") 'gptel-send))
-
-;; (gptel-make-ollama "Ollama-cl"
-;;   :host "localhost:11434"    
-;;   :stream t              
-;;   :models '(codellama:7b))
-;; ;; (setq gptel--debug t)
-;; ;; (setq gptel-log-level 'debug)
-;; (setq gptel-temperature 0.0)
-;; (setq
-;;  gptel-model 'codellama:7b
-;;  gptel-backend (gptel-make-ollama "Ollama"
-;;                  :host "localhost:11434"
-;;                  :stream t
-;;                  :models '(codellama:7b)))
-
-
-(use-package time-table
-  :straight (time-table :type git :host github :repo "MarselScheer/time-table" :branch "time-table-buffer")
-  :custom
-  (time-table-work-hours 0)
-  (time-table-file "~/syncthing/orgfiles/tracked-times")
-  (time-table-project-names '("book" "kg" "time-table" "emacs" "backup" "end"))
-  (time-table-task-names '("code" "tex" "math" "end")))
-(define-key evil-motion-state-map (kbd "SPC t t") 'time-table-track)
-(define-key evil-motion-state-map (kbd "SPC t s") 'time-table-status)
-(define-key evil-motion-state-map (kbd "SPC t S") 'time-table-summarize-projects-last-7-days)
-(define-key evil-motion-state-map (kbd "SPC t b") 'time-table-find-tracking-file)
-(define-key evil-motion-state-map (kbd "SPC t e") 'time-table-end-tracking)
