@@ -63,6 +63,10 @@
 				(clock-out . ""))))
 (define-key evil-motion-state-map (kbd "SPC o a") 'org-agenda)
 (define-key evil-motion-state-map (kbd "SPC o i") 'org-indent-mode)
+(eval-after-load "org-agenda"
+  '(progn
+     (define-key org-agenda-mode-map "j" 'org-agenda-next-line)
+     (define-key org-agenda-mode-map "k" 'org-agenda-previous-line)))
 
 (use-package vertico
   :init
