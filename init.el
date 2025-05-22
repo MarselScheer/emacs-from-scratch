@@ -63,6 +63,10 @@
 				(clock-out . ""))))
 (define-key evil-motion-state-map (kbd "SPC o a") 'org-agenda)
 (define-key evil-motion-state-map (kbd "SPC o i") 'org-indent-mode)
+(define-key evil-motion-state-map (kbd "SPC o c") 'org-toggle-checkbox)
+(define-key evil-motion-state-map (kbd "SPC o s") 'org-save-all-org-buffers)
+(define-key evil-motion-state-map (kbd "SPC n s") 'org-narrow-to-subtree)
+(define-key evil-motion-state-map (kbd "SPC n w") 'widen)
 (eval-after-load "org-agenda"
   '(progn
      (define-key org-agenda-mode-map "j" 'org-agenda-next-line)
@@ -121,8 +125,6 @@
   :bind (("C-s" . consult-line) ;; search
 	      ("C-x b" . consult-buffer)))
 
-(define-key evil-motion-state-map (kbd "SPC p s r") 'consult-ripgrep)
-
 (use-package which-key
   :config
   (which-key-mode))
@@ -134,6 +136,9 @@
 (use-package projectile
   :config (projectile-mode))
 (define-key evil-motion-state-map (kbd "SPC p") 'projectile-command-map)
+;; need to define keybinding for consult after the projectile commands
+;; because SPC p is already referring to projectile-command-map
+(define-key evil-motion-state-map (kbd "SPC p s r") 'consult-ripgrep)
 
 (use-package magit)
 (define-key evil-motion-state-map (kbd "SPC g g") 'magit-status)
@@ -264,7 +269,8 @@
 (define-key evil-motion-state-map (kbd "e") 'er/expand-region)
 
 (use-package embark
-  :bind ("C-." . embark-act))
+  :bind(:map minibuffer-local-map
+	     ("C-c C-c" . embark-collect)))
 (use-package embark-consult)
 
 (use-package evil-snipe

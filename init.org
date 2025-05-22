@@ -85,6 +85,10 @@
      				(clock-out . ""))))
      (define-key evil-motion-state-map (kbd "SPC o a") 'org-agenda)
      (define-key evil-motion-state-map (kbd "SPC o i") 'org-indent-mode)
+     (define-key evil-motion-state-map (kbd "SPC o c") 'org-toggle-checkbox)
+     (define-key evil-motion-state-map (kbd "SPC o s") 'org-save-all-org-buffers)
+     (define-key evil-motion-state-map (kbd "SPC n s") 'org-narrow-to-subtree)
+     (define-key evil-motion-state-map (kbd "SPC n w") 'widen)
      (eval-after-load "org-agenda"
        '(progn
           (define-key org-agenda-mode-map "j" 'org-agenda-next-line)
@@ -160,8 +164,6 @@
      (use-package consult
        :bind (("C-s" . consult-line) ;; search
 	      ("C-x b" . consult-buffer)))
-
-     (define-key evil-motion-state-map (kbd "SPC p s r") 'consult-ripgrep)
    #+end_src
 
 ** ivy (deactivated use vertico, marginalia, orderless and consult)
@@ -232,6 +234,9 @@ like searching through all files.
      (use-package projectile
        :config (projectile-mode))
      (define-key evil-motion-state-map (kbd "SPC p") 'projectile-command-map)
+     ;; need to define keybinding for consult after the projectile commands
+     ;; because SPC p is already referring to projectile-command-map
+     (define-key evil-motion-state-map (kbd "SPC p s r") 'consult-ripgrep)
    #+end_src
 
 
@@ -530,7 +535,8 @@ of a 'indentation-level' the cursor is in.
 
    #+begin_src emacs-lisp
      (use-package embark
-       :bind ("C-." . embark-act))
+       :bind(:map minibuffer-local-map
+     	     ("C-c C-c" . embark-collect)))
      (use-package embark-consult)
    #+end_src
 
