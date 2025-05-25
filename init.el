@@ -63,6 +63,14 @@
 				(clock-out . ""))))
 (define-key evil-motion-state-map (kbd "SPC o a") 'org-agenda)
 (define-key evil-motion-state-map (kbd "SPC o i") 'org-indent-mode)
+(define-key evil-motion-state-map (kbd "SPC o c") 'org-toggle-checkbox)
+(define-key evil-motion-state-map (kbd "SPC o s") 'org-save-all-org-buffers)
+(define-key evil-motion-state-map (kbd "SPC n s") 'org-narrow-to-subtree)
+(define-key evil-motion-state-map (kbd "SPC n w") 'widen)
+(eval-after-load "org-agenda"
+  '(progn
+     (define-key org-agenda-mode-map "j" 'org-agenda-next-line)
+     (define-key org-agenda-mode-map "k" 'org-agenda-previous-line)))
 
 (use-package vertico
   :init
@@ -114,10 +122,7 @@
   (completion-styles '(orderless basic)))
 
 (use-package consult
-  :bind (("C-s" . consult-line) ;; search
-	      ("C-x b" . consult-buffer)))
-
-(define-key evil-motion-state-map (kbd "SPC p s r") 'consult-ripgrep)
+  :bind (("C-s" . consult-line))) ;; search
 
 (use-package which-key
   :config
@@ -130,6 +135,9 @@
 (use-package projectile
   :config (projectile-mode))
 (define-key evil-motion-state-map (kbd "SPC p") 'projectile-command-map)
+;; need to define keybinding for consult after the projectile commands
+;; because SPC p is already referring to projectile-command-map
+(define-key evil-motion-state-map (kbd "SPC p s r") 'consult-ripgrep)
 
 (use-package magit)
 (define-key evil-motion-state-map (kbd "SPC g g") 'magit-status)
@@ -176,8 +184,8 @@
 (use-package lsp-pyright
   :ensure t
   :hook (python-mode . (lambda ()
-			      (require 'lsp-pyright)
-			      (lsp))))  ; or lsp-deferred
+			 (require 'lsp-pyright)
+			 (lsp))))  ; or lsp-deferred
 
 (use-package ace-jump-mode
   :config
@@ -260,7 +268,8 @@
 (define-key evil-motion-state-map (kbd "e") 'er/expand-region)
 
 (use-package embark
-  :bind ("C-." . embark-act))
+  :bind(:map minibuffer-local-map
+	     ("C-c C-c" . embark-collect)))
 (use-package embark-consult)
 
 (use-package evil-snipe
@@ -288,7 +297,9 @@
   :hook (python-mode . python-black-on-save-mode))
 
 (use-package python-mode
-  :hook (python-mode . lsp-deferred))
+  :hook (python-mode . (lambda ()
+			 (define-key python-mode-map (kbd "TAB") 'completion-at-point)
+			 (lsp-deferred))))
   ;; :config
   ;; ;; (require 'dap-python)
   ;; (evil-define-key 'normal 'python-mode-map (kbd "SPC r i") 'py-switch-to-shell)
@@ -367,3 +378,7 @@
 ;;  :init (doom-modeline-mode 0))
 (use-package telephone-line)
 (telephone-line-mode 1)
+
+
+;; machine-custom
+(use-package auctex)

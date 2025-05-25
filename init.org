@@ -85,6 +85,14 @@
      				(clock-out . ""))))
      (define-key evil-motion-state-map (kbd "SPC o a") 'org-agenda)
      (define-key evil-motion-state-map (kbd "SPC o i") 'org-indent-mode)
+     (define-key evil-motion-state-map (kbd "SPC o c") 'org-toggle-checkbox)
+     (define-key evil-motion-state-map (kbd "SPC o s") 'org-save-all-org-buffers)
+     (define-key evil-motion-state-map (kbd "SPC n s") 'org-narrow-to-subtree)
+     (define-key evil-motion-state-map (kbd "SPC n w") 'widen)
+     (eval-after-load "org-agenda"
+       '(progn
+          (define-key org-agenda-mode-map "j" 'org-agenda-next-line)
+          (define-key org-agenda-mode-map "k" 'org-agenda-previous-line)))
    #+end_src
 
 ** vertico (minibuffer)
@@ -154,10 +162,7 @@
 
    #+begin_src emacs-lisp
      (use-package consult
-       :bind (("C-s" . consult-line) ;; search
-	      ("C-x b" . consult-buffer)))
-
-     (define-key evil-motion-state-map (kbd "SPC p s r") 'consult-ripgrep)
+       :bind (("C-s" . consult-line))) ;; search
    #+end_src
 
 ** ivy (deactivated use vertico, marginalia, orderless and consult)
@@ -228,6 +233,9 @@ like searching through all files.
      (use-package projectile
        :config (projectile-mode))
      (define-key evil-motion-state-map (kbd "SPC p") 'projectile-command-map)
+     ;; need to define keybinding for consult after the projectile commands
+     ;; because SPC p is already referring to projectile-command-map
+     (define-key evil-motion-state-map (kbd "SPC p s r") 'consult-ripgrep)
    #+end_src
 
 
@@ -277,8 +285,8 @@ various language servers for instance for python or R.
        (setq lsp-keymap-prefix "C-c l")
        (setq xref-auto-jump-to-first-definition nil) ;; necessary in older emacs for "find-definition"-functionality
        (defun my/lsp-mode-setup-completion ()
-	 (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-	       '(orderless))) ;; Configure orderless
+     	 (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+     	       '(orderless))) ;; Configure orderless
        :hook
        (lsp-completion-mode . my/lsp-mode-setup-completion)
        :config
@@ -305,8 +313,8 @@ various language servers for instance for python or R.
      (use-package lsp-pyright
        :ensure t
        :hook (python-mode . (lambda ()
-			      (require 'lsp-pyright)
-			      (lsp))))  ; or lsp-deferred
+     			 (require 'lsp-pyright)
+     			 (lsp))))  ; or lsp-deferred
    #+end_src
 
 ** flycheck (deactivated)
@@ -526,7 +534,8 @@ of a 'indentation-level' the cursor is in.
 
    #+begin_src emacs-lisp
      (use-package embark
-       :bind ("C-." . embark-act))
+       :bind(:map minibuffer-local-map
+     	     ("C-c C-c" . embark-collect)))
      (use-package embark-consult)
    #+end_src
 
@@ -612,7 +621,9 @@ of a 'indentation-level' the cursor is in.
 
    #+begin_src emacs-lisp
      (use-package python-mode
-       :hook (python-mode . lsp-deferred))
+       :hook (python-mode . (lambda ()
+     			 (define-key python-mode-map (kbd "TAB") 'completion-at-point)
+     			 (lsp-deferred))))
        ;; :config
        ;; ;; (require 'dap-python)
        ;; (evil-define-key 'normal 'python-mode-map (kbd "SPC r i") 'py-switch-to-shell)
