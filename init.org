@@ -286,8 +286,8 @@ various language servers for instance for python or R.
        (setq lsp-keymap-prefix "C-c l")
        (setq xref-auto-jump-to-first-definition nil) ;; necessary in older emacs for "find-definition"-functionality
        (defun my/lsp-mode-setup-completion ()
-	 (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-	       '(orderless))) ;; Configure orderless
+     	 (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+     	       '(orderless))) ;; Configure orderless
        :hook
        (lsp-completion-mode . my/lsp-mode-setup-completion)
        :config
@@ -314,8 +314,8 @@ various language servers for instance for python or R.
      (use-package lsp-pyright
        :ensure t
        :hook (python-mode . (lambda ()
-			      (require 'lsp-pyright)
-			      (lsp))))  ; or lsp-deferred
+     			 (require 'lsp-pyright)
+     			 (lsp))))  ; or lsp-deferred
    #+end_src
 
 ** flycheck (deactivated)
@@ -622,7 +622,9 @@ of a 'indentation-level' the cursor is in.
 
    #+begin_src emacs-lisp
      (use-package python-mode
-       :hook (python-mode . lsp-deferred))
+       :hook (python-mode . (lambda ()
+     			 (define-key python-mode-map (kbd "TAB") 'completion-at-point)
+     			 (lsp-deferred))))
        ;; :config
        ;; ;; (require 'dap-python)
        ;; (evil-define-key 'normal 'python-mode-map (kbd "SPC r i") 'py-switch-to-shell)

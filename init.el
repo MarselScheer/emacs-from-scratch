@@ -185,8 +185,8 @@
 (use-package lsp-pyright
   :ensure t
   :hook (python-mode . (lambda ()
-			      (require 'lsp-pyright)
-			      (lsp))))  ; or lsp-deferred
+			 (require 'lsp-pyright)
+			 (lsp))))  ; or lsp-deferred
 
 (use-package ace-jump-mode
   :config
@@ -298,7 +298,9 @@
   :hook (python-mode . python-black-on-save-mode))
 
 (use-package python-mode
-  :hook (python-mode . lsp-deferred))
+  :hook (python-mode . (lambda ()
+			 (define-key python-mode-map (kbd "TAB") 'completion-at-point)
+			 (lsp-deferred))))
   ;; :config
   ;; ;; (require 'dap-python)
   ;; (evil-define-key 'normal 'python-mode-map (kbd "SPC r i") 'py-switch-to-shell)
@@ -377,3 +379,7 @@
 ;;  :init (doom-modeline-mode 0))
 (use-package telephone-line)
 (telephone-line-mode 1)
+
+
+;; machine-custom
+(use-package auctex)
