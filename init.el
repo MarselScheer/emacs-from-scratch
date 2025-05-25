@@ -122,8 +122,7 @@
   (completion-styles '(orderless basic)))
 
 (use-package consult
-  :bind (("C-s" . consult-line) ;; search
-	      ("C-x b" . consult-buffer)))
+  :bind (("C-s" . consult-line))) ;; search
 
 (use-package which-key
   :config

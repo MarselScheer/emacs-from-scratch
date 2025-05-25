@@ -162,8 +162,7 @@
 
    #+begin_src emacs-lisp
      (use-package consult
-       :bind (("C-s" . consult-line) ;; search
-	      ("C-x b" . consult-buffer)))
+       :bind (("C-s" . consult-line))) ;; search
    #+end_src
 
 ** ivy (deactivated use vertico, marginalia, orderless and consult)
