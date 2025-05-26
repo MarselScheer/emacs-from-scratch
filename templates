@@ -1,0 +1,16 @@
+text-mode
+
+(box "┌─" (make-string (length str) ?─) "─┐" n
+     "│ " (p "one line text" str)       " │" n
+     "└─" (make-string (length str) ?─) "─┘" n)
+(calc (p "taylor(sin(x),x=0,3)" formula) n "----" n (format "%s" (calc-eval formula)))
+
+org-mode
+(elisp "#+begin_src emacs-lisp" n r n "#+end_src" :post (org-edit-src-code))
+(t (format-time-string "TODO [%Y-%m-%d %a]: ") q (format-time-string " <%Y-%m-%d %a>"))
+(c (format-time-string "=com [%Y-%m-%d %a] --") q "=")
+
+;; Local Variables:
+;; mode: lisp-data
+;; outline-regexp: "[a-z]"
+;; End:

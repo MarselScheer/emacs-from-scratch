@@ -48,6 +48,8 @@
   ;; 	("j" . org-agenda-next-line)
   ;; 	("k" . org-agenda-previous-line))
   :config
+  (setq org-M-RET-may-split-line nil)
+  (setq org-insert-heading-respect-content t)
   (setq org-agenda-files (directory-files "~/syncthing/orgfiles" 1 "org$"))
   (setq org-log-done "time")
   (setq org-todo-keywords '((sequence "TODO(t)" "CONT(c)" "WAIT(w)" "|" "DONE(d)" "ABORTED(a)")))
@@ -65,8 +67,10 @@
 (define-key evil-motion-state-map (kbd "SPC o i") 'org-indent-mode)
 (define-key evil-motion-state-map (kbd "SPC o c") 'org-toggle-checkbox)
 (define-key evil-motion-state-map (kbd "SPC o s") 'org-save-all-org-buffers)
+(define-key evil-motion-state-map (kbd "SPC o h") 'org-toggle-heading)
 (define-key evil-motion-state-map (kbd "SPC n s") 'org-narrow-to-subtree)
 (define-key evil-motion-state-map (kbd "SPC n w") 'widen)
+(define-key evil-motion-state-map (kbd "SPC n t") 'org-show-todo-tree)
 (eval-after-load "org-agenda"
   '(progn
      (define-key org-agenda-mode-map "j" 'org-agenda-next-line)
@@ -190,6 +194,38 @@
 (use-package ace-jump-mode
   :config
   (define-key evil-motion-state-map (kbd "SPC s") 'ace-jump-word-mode))
+
+(use-package tempel
+  ;; Require trigger prefix before template name when completing.
+  ;; :custom
+  ;; (tempel-trigger-prefix "<")
+
+  :bind (("M-*" . tempel-insert))
+	 ;; ("M-+" . tempel-complete) ;; Alternative tempel-expand
+
+  :init
+  ;; Setup completion at point
+  (defun tempel-setup-capf ()
+    ;; Add the Tempel Capf to `completion-at-point-functions'.
+    ;; `tempel-expand' only triggers on exact matches. Alternatively use
+    ;; `tempel-complete' if you want to see all matches, but then you
+    ;; should also configure `tempel-trigger-prefix', such that Tempel
+    ;; does not trigger too often when you don't expect it. NOTE: We add
+    ;; `tempel-expand' *before* the main programming mode Capf, such
+    ;; that it will be tried first.
+    (setq-local completion-at-point-functions
+                (cons #'tempel-expand
+                      completion-at-point-functions)))
+
+  ;; (add-hook 'conf-mode-hook 'tempel-setup-capf)
+  ;; (add-hook 'prog-mode-hook 'tempel-setup-capf)
+  (add-hook 'text-mode-hook 'tempel-setup-capf)
+
+  ;; Optionally make the Tempel templates available to Abbrev,
+  ;; either locally or globally. `expand-abbrev' is bound to C-x '.
+  ;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
+  ;; (global-tempel-abbrev-mode)
+)
 
 (use-package beacon
   :config
@@ -378,7 +414,3 @@
 ;;  :init (doom-modeline-mode 0))
 (use-package telephone-line)
 (telephone-line-mode 1)
-
-
-;; machine-custom
-(use-package auctex)
