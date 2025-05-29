@@ -7,7 +7,8 @@ text-mode
 
 org-mode
 (elisp "#+begin_src emacs-lisp" n r n "#+end_src" :post (org-edit-src-code))
-(t (format-time-string "TODO [%Y-%m-%d %a]: ") q (format-time-string " <%Y-%m-%d %a>"))
+(t (format-time-string "TODO [%Y-%m-%d %a]: ") q (format-time-string " <%Y-%m-%d %a>") :post (progn (org-toggle-heading) (org-metaleft)))
+(ts (format-time-string "TODO [%Y-%m-%d %a]: ") q (format-time-string " <%Y-%m-%d %a>") :post (org-toggle-heading))
 (c (format-time-string "=com [%Y-%m-%d %a] --") q "=")
 
 ;; Local Variables:
