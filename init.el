@@ -126,7 +126,20 @@
   (completion-styles '(orderless basic)))
 
 (use-package consult
-  :bind (("C-s" . consult-line))) ;; search
+   :bind (("C-s" . consult-line))) ;; search
+(defun ms/consult-line-symbol-at-point ()
+    "Search for a line matching the symbol found near point."
+    (interactive)
+    (consult-line
+     (or (thing-at-point 'symbol))))
+(defun ms/consult-line-last-search ()
+    "Search for a line matching the symbol used during last search."
+    (interactive)
+    (consult-line
+     (or (car consult--line-history))))
+(define-key evil-motion-state-map (kbd "SPC f p") 'ms/consult-line-symbol-at-point)
+(define-key evil-motion-state-map (kbd "SPC f l") 'ms/consult-line-last-search)
+(define-key evil-motion-state-map (kbd "SPC f s") 'consult-line)
 
 (use-package which-key
   :config
@@ -200,8 +213,8 @@
   ;; :custom
   ;; (tempel-trigger-prefix "<")
 
-  :bind (("M-*" . tempel-insert))
-	 ;; ("M-+" . tempel-complete) ;; Alternative tempel-expand
+  ;; :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
+  ;;        ("M-*" . tempel-insert))
 
   :init
   ;; Setup completion at point

@@ -167,6 +167,19 @@
    #+begin_src emacs-lisp
      (use-package consult
        :bind (("C-s" . consult-line))) ;; search
+    (defun ms/consult-line-symbol-at-point ()
+        "Search for a line matching the symbol found near point."
+        (interactive)
+        (consult-line
+         (or (thing-at-point 'symbol))))
+    (defun ms/consult-line-last-search ()
+        "Search for a line matching the symbol used during last search."
+        (interactive)
+        (consult-line
+         (or (car consult--line-history))))
+    (define-key evil-motion-state-map (kbd "SPC f p") 'ms/consult-line-symbol-at-point)
+    (define-key evil-motion-state-map (kbd "SPC f l") 'ms/consult-line-last-search)
+    (define-key evil-motion-state-map (kbd "SPC f s") 'consult-line)
    #+end_src
 
 ** ivy (deactivated use vertico, marginalia, orderless and consult)
