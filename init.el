@@ -264,17 +264,13 @@
   ;; (setq gptel-log-level 'debug)
   (setq gptel-temperature 0.0)
   (global-set-key (kbd "C-c <RET>") 'gptel-send)
-  (gptel-make-ollama "Ollama0"
-    :host "ollama:11434"
-    :stream t
-    :models '(gemma3:4b))
   (gptel-make-ollama "Ollama1"
     :host "ollama:11434"
     :stream t
-    :models '(cogito:8b))
+    :models '(magistral))
   (setq
    gptel-model 'codellama:7b
-   gptel-backend (gptel-make-ollama "Ollama2"
+   gptel-backend (gptel-make-ollama "Ollama0"
 		   :host "localhost:11434"
 		   :stream t
 		   :models '(codellama:7b))))
