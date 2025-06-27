@@ -329,6 +329,15 @@
   (global-evil-visualstar-mode)
   (setq evil-visualstar/persistent 1))
 
+(use-package aidermacs
+  :config
+  (setenv "OLLAMA_API_BASE" "http://192.168.1.10:11434")
+  :custom
+  (aidermacs-default-chat-mode 'architect)
+  (aidermacs-default-model "ollama/magistral"))
+(define-key evil-motion-state-map (kbd "SPC a") 'aidermacs-transient-menu)
+(setq ediff-split-window-function 'split-window-vertically)
+
 (use-package time-table
   :straight (time-table :type git :host github :repo "MarselScheer/time-table" :branch "time-table-buffer")
   :custom

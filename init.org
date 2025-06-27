@@ -607,6 +607,17 @@ of a 'indentation-level' the cursor is in.
        (setq evil-visualstar/persistent 1))
    #+end_src
 
+** aidermacs
+#+begin_src emacs-lisp
+  (use-package aidermacs
+    :config
+    (setenv "OLLAMA_API_BASE" "http://192.168.1.10:11434")
+    :custom
+    (aidermacs-default-chat-mode 'architect)
+    (aidermacs-default-model "ollama/magistral"))
+  (define-key evil-motion-state-map (kbd "SPC a") 'aidermacs-transient-menu)
+  (setq ediff-split-window-function 'split-window-vertically)
+#+end_src
 * own packages
 ** time table
 #+begin_src emacs-lisp
