@@ -678,8 +678,11 @@ of a 'indentation-level' the cursor is in.
    #     (py-execute-region beg end))
    # #+end_src
    #+begin_src emacs-lisp
-     (use-package python-black
-       :hook (python-mode . python-black-on-save-mode))
+     (use-package flymake-ruff)
+     (add-hook 'python-mode-hook #'flymake-ruff-load)
+
+     (use-package ruff-format)
+     (add-hook 'python-mode-hook 'ruff-format-on-save-mode)
    #+end_src
 
    #+begin_src emacs-lisp

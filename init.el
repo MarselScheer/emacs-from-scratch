@@ -351,8 +351,11 @@
 (define-key evil-motion-state-map (kbd "SPC t b") 'time-table-find-tracking-file)
 (define-key evil-motion-state-map (kbd "SPC t e") 'time-table-end-tracking)
 
-(use-package python-black
-  :hook (python-mode . python-black-on-save-mode))
+(use-package flymake-ruff)
+(add-hook 'python-mode-hook #'flymake-ruff-load)
+
+(use-package ruff-format)
+(add-hook 'python-mode-hook 'ruff-format-on-save-mode)
 
 (use-package python-mode
   :hook (python-mode . (lambda ()
