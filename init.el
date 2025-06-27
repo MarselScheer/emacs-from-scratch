@@ -396,6 +396,10 @@
 (evil-define-key 'normal my-intercept-mode-map
   (kbd "SPC w") 'evil-window-map)
 
+(define-key evil-motion-state-map (kbd "SPC m s") 'bookmark-set)
+(define-key evil-motion-state-map (kbd "SPC m j") 'bookmark-jump)
+(define-key evil-motion-state-map (kbd "SPC m J") 'bookmark-jump-other-window)
+
 (setq inhibit-startup-screen t)
 (scroll-bar-mode -1)
 (tool-bar-mode -1)

@@ -847,7 +847,8 @@ Polymode for working with Rmd-files
    #     :ensure t)
    # #+end_src
 
-* General key bindings. Copied from https://github.com/emacs-evil/evil-collection
+* General key bindings.
+** Copied from https://github.com/emacs-evil/evil-collection
    #+begin_src emacs-lisp
      (defvar my-intercept-mode-map (make-sparse-keymap)
        "High precedence keymap.")
@@ -877,6 +878,12 @@ Polymode for working with Rmd-files
      (evil-define-key 'normal my-intercept-mode-map
        (kbd "SPC w") 'evil-window-map)
    #+end_src
+ ** bookmarks
+ #+begin_src emacs-lisp
+   (define-key evil-motion-state-map (kbd "SPC m s") 'bookmark-set)
+   (define-key evil-motion-state-map (kbd "SPC m j") 'bookmark-jump)
+   (define-key evil-motion-state-map (kbd "SPC m J") 'bookmark-jump-other-window)
+#+end_src
 
 * ui
 ** general
