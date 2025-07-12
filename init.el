@@ -158,6 +158,8 @@
 
 (use-package magit)
 (define-key evil-motion-state-map (kbd "SPC g g") 'magit-status)
+(define-key evil-motion-state-map (kbd "SPC g b") 'magit-blame)
+(define-key evil-motion-state-map (kbd "SPC g d") 'magit-diff-dwim)
 
 (use-package diff-hl
   :config (global-diff-hl-mode))
@@ -191,6 +193,7 @@
 (define-key evil-motion-state-map (kbd "SPC l d") 'lsp-describe-thing-at-point)
 (define-key evil-motion-state-map (kbd "SPC l r") 'lsp-rename)
 (define-key evil-motion-state-map (kbd "SPC l f") 'lsp-find-definition)
+(define-key evil-motion-state-map (kbd "SPC l u") 'lsp-find-references)
 (define-key evil-motion-state-map (kbd "SPC l c") 'comment-or-uncomment-region)
 
 ;; Enables "pop-up's" with additional information about
