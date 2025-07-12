@@ -1,4 +1,4 @@
-text-mode
+fundamental-mode
 
 (box "┌─" (make-string (length str) ?─) "─┐" n
      "│ " (p "one line text" str)       " │" n
