@@ -613,7 +613,7 @@ of a 'indentation-level' the cursor is in.
     (setenv "OLLAMA_API_BASE" "http://192.168.1.10:11434")
     :custom
     (aidermacs-default-chat-mode 'architect)
-    (aidermacs-default-model "ollama/magistral"))
+    (aidermacs-default-model "openrouter/mistralai/mistral-small-3.2-24b-instruct"))
   (define-key evil-motion-state-map (kbd "SPC a") 'aidermacs-transient-menu)
   (setq ediff-split-window-function 'split-window-vertically)
 #+end_src
