@@ -947,3 +947,11 @@ Polymode for working with Rmd-files
      (telephone-line-mode 1)
    #+end_src
    
+
+* Emacs native config
+** backup
+   #+begin_src emacs-lisp
+     (setq backup-directory-alist `(("." . ,(expand-file-name "tmp/backups/" user-emacs-directory))))
+     (setq version-control t)
+     (setq kept-new-versions 7)
+   #+end_src
