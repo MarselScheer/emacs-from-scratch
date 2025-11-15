@@ -266,17 +266,22 @@
   ;; (setq gptel--debug t)
   ;; (setq gptel-log-level 'debug)
   (setq gptel-temperature 0.0)
-  (global-set-key (kbd "C-c <RET>") 'gptel-send)
-  (gptel-make-ollama "Ollama1"
-    :host "ollama:11434"
+  (global-set-key (kbd "C-<return>") 'gptel-send)
+  (add-to-list 'gptel-directives '(explain . "Explain the code to a novice programmer"))
+  (gptel-make-preset 'explain
+    :system "Explain the code does to a novice programmer.")
+  (gptel-make-ollama "Ollama"
+    :host "localhost:11434"
     :stream t
-    :models '(magistral))
-  (setq
-   gptel-model 'codellama:7b
-   gptel-backend (gptel-make-ollama "Ollama0"
-		   :host "localhost:11434"
-		   :stream t
-		   :models '(codellama:7b))))
+    :models '(codellama:7b))
+  (setq gptel-model   'mistralai/mistral-small-3.2-24b-instruct
+      gptel-backend
+      (gptel-make-openai "OpenRouter"               ;Any name you want
+        :host "openrouter.ai"
+        :endpoint "/api/v1/chat/completions"
+        :stream t
+        :key (getenv "OPENROUTER_API_KEY")
+        :models '(mistralai/mistral-small-3.2-24b-instruct))))
 
 (defun ollama-only-code-curl-to-buffer (text)
   "Send TEXT to a buffer with the name BUFFER-NAME."
@@ -333,7 +338,7 @@
   (setenv "OLLAMA_API_BASE" "http://192.168.1.10:11434")
   :custom
   (aidermacs-default-chat-mode 'architect)
-  (aidermacs-default-model "ollama/magistral"))
+  (aidermacs-default-model "openrouter/mistralai/mistral-small-3.2-24b-instruct"))
 (define-key evil-motion-state-map (kbd "SPC a") 'aidermacs-transient-menu)
 (setq ediff-split-window-function 'split-window-vertically)
 
@@ -442,3 +447,7 @@
 ;;  :init (doom-modeline-mode 0))
 (use-package telephone-line)
 (telephone-line-mode 1)
+
+(setq backup-directory-alist `(("." . ,(expand-file-name "tmp/backups/" user-emacs-directory))))
+(setq version-control t)
+(setq kept-new-versions 7)

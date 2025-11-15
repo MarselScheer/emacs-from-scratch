@@ -521,17 +521,25 @@ of a 'indentation-level' the cursor is in.
        ;; (setq gptel--debug t)
        ;; (setq gptel-log-level 'debug)
        (setq gptel-temperature 0.0)
-       (global-set-key (kbd "C-c <RET>") 'gptel-send)
-       (gptel-make-ollama "Ollama1"
-         :host "ollama:11434"
+       (global-set-key (kbd "C-<return>") 'gptel-send)
+       (add-to-list 'gptel-directives '(explain . "Explain the code to a novice programmer"))
+       (add-to-list 'gptel-directives '(py-doc . "You are a experienced python programmer specialized on extending a python function or class with short and precise docstrings and annotations. You do not change the code in any way! If you see docstrings that do not follow the Google Style you convert then into the Google Style. Preserve the function with its comments. ONLY add docstrings and annotations if necessary. Also no additional explanations from your side or any ```python marks, this would be a desasters ruining by code!"))
+       (add-to-list 'gptel-directives '(py-complete . "You are an experienced python programmer. You make short proposals for how to continue an implementation or if you see instructions introduced with `# AI: ` follow those instructions. That means you DO NOT REPEAT the existing code but only provide the code that should follow. It is forbidden to use ```python tags because this will ruin the usage of your code."))
+       (gptel-make-preset 'explain
+         :system "Explain the code does to a novice programmer.")
+       (gptel-make-ollama "Ollama"
+         :host "localhost:11434"
          :stream t
-         :models '(magistral))
-       (setq
-        gptel-model 'codellama:7b
-        gptel-backend (gptel-make-ollama "Ollama0"
-     		   :host "localhost:11434"
-     		   :stream t
-     		   :models '(codellama:7b))))
+         :models '(codellama:7b))
+       (setq gptel-model   'mistralai/mistral-small-3.2-24b-instruct
+           gptel-backend
+           (gptel-make-openai "OpenRouter"               ;Any name you want
+             :host "openrouter.ai"
+             :endpoint "/api/v1/chat/completions"
+             :stream t
+             :key (getenv "OPENROUTER_API_KEY")
+             :models '(mistralai/mistral-small-3.2-24b-instruct
+     		  openai/gpt-oss-120b))))
    #+end_src
 
 ** llm-functions
@@ -947,7 +955,6 @@ Polymode for working with Rmd-files
      (telephone-line-mode 1)
    #+end_src
    
-
 * Emacs native config
 ** backup
    #+begin_src emacs-lisp
