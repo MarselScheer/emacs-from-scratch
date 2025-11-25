@@ -983,6 +983,7 @@ Polymode for working with Rmd-files
 ** backup
    #+begin_src emacs-lisp
      (setq backup-directory-alist `(("." . ,(expand-file-name "tmp/backups/" user-emacs-directory))))
+     (setq delete-old-versions t)
      (setq version-control t)
      (setq kept-new-versions 7)
    #+end_src
