@@ -897,8 +897,13 @@ Polymode for working with Rmd-files
 
 * ui
 ** general
+*** Visual wrap prefix (indent wrapped lines appropriately)
+    #+begin_src emacs-lisp
+      (global-visual-line-mode 1)
+      (global-visual-wrap-prefix-mode 1)
+    #+end_src
 *** Remove various UI-elements
-   #+begin_src emacs-lisp
+#+begin_src emacs-lisp
      (setq inhibit-startup-screen t)
      (scroll-bar-mode -1)
      (tool-bar-mode -1)
