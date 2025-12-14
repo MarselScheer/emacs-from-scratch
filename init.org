@@ -706,6 +706,9 @@ of a 'indentation-level' the cursor is in.
        ;; (setq py-split-window-on-execute nil))
        ;; ;; (setq dap-python-debugger 'debugpy)
      ;; (define-key python-mode-map (kbd "TAB") 'completion-at-point)
+
+     (setq python-shell-interpreter "uv")
+     (setq python-shell-interpreter-args "run python -i")
    #+end_src
 
 ** R (deactivated)
