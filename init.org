@@ -536,10 +536,6 @@ of a 'indentation-level' the cursor is in.
        (setq gptel-temperature 0.0)
        (global-set-key (kbd "C-<return>") 'gptel-send)
        (add-to-list 'gptel-directives '(explain . "Explain the code to a novice programmer"))
-       (add-to-list 'gptel-directives '(py-doc . "You are a experienced python programmer specialized on extending a python function or class with short and precise docstrings and annotations. You do not change the code in any way! If you see docstrings that do not follow the Google Style you convert then into the Google Style. Preserve the function with its comments. ONLY add docstrings and annotations if necessary. Also no additional explanations from your side or any ```python marks, this would be a desasters ruining by code!"))
-       (add-to-list 'gptel-directives '(py-complete . "You are an experienced python programmer. You make short proposals for how to continue an implementation or if you see instructions introduced with `# AI: ` follow those instructions. That means you DO NOT REPEAT the existing code but only provide the code that should follow. It is forbidden to use ```python tags because this will ruin the usage of your code."))
-       (gptel-make-preset 'explain
-         :system "Explain the code does to a novice programmer.")
        (gptel-make-ollama "Ollama"
          :host "localhost:11434"
          :stream t
@@ -637,6 +633,13 @@ of a 'indentation-level' the cursor is in.
     (aidermacs-default-model "openrouter/mistralai/mistral-small-3.2-24b-instruct"))
   (define-key evil-motion-state-map (kbd "SPC a") 'aidermacs-transient-menu)
   (setq ediff-split-window-function 'split-window-vertically)
+#+end_src
+** eca
+#+begin_src emacs-lisp
+  (use-package eca
+    :ensure t
+    :straight (:host github :repo "editor-code-assistant/eca-emacs" :files ("*.el")))
+  ;; (setq eca-extra-args '("--verbose" "--log-level" "debug"))
 #+end_src
 * own packages
 ** time table
