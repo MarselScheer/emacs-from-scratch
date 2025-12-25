@@ -83,8 +83,8 @@
 (define-key evil-motion-state-map (kbd "SPC n s") 'org-narrow-to-subtree)
 (define-key evil-motion-state-map (kbd "SPC n w") 'widen)
 (define-key evil-motion-state-map (kbd "SPC n t") 'org-show-todo-tree)
-(define-key evil-motion-state-map (kbd "SPC o f r") (lambda () (interactive) (org-capture nil "f")))
-(define-key evil-motion-state-map (kbd "SPC o f p") (lambda () (interactive) (org-capture nil "p")))
+(define-key evil-motion-state-map (kbd "SPC o n r") (lambda () (interactive) (org-capture nil "f")))
+(define-key evil-motion-state-map (kbd "SPC o n p") (lambda () (interactive) (org-capture nil "p")))
 (eval-after-load "org-agenda"
   '(progn
      (define-key org-agenda-mode-map "j" 'org-agenda-next-line)
@@ -392,14 +392,14 @@
   (global-evil-visualstar-mode)
   (setq evil-visualstar/persistent 1))
 
-(use-package aidermacs
-  :config
-  (setenv "OLLAMA_API_BASE" "http://192.168.1.10:11434")
-  :custom
-  (aidermacs-default-chat-mode 'architect)
-  (aidermacs-default-model "openrouter/mistralai/mistral-small-3.2-24b-instruct"))
-(define-key evil-motion-state-map (kbd "SPC a") 'aidermacs-transient-menu)
-(setq ediff-split-window-function 'split-window-vertically)
+;; (use-package aidermacs
+;;   :config
+;;   (setenv "OLLAMA_API_BASE" "http://192.168.1.10:11434")
+;;   :custom
+;;   (aidermacs-default-chat-mode 'architect)
+;;   (aidermacs-default-model "openrouter/mistralai/mistral-small-3.2-24b-instruct"))
+;; (define-key evil-motion-state-map (kbd "SPC a") 'aidermacs-transient-menu)
+;; (setq ediff-split-window-function 'split-window-vertically)
 
 (use-package eca
   :ensure t
