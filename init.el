@@ -298,7 +298,7 @@
     :host "localhost:11434"
     :stream t
     :models '(codellama:7b))
-  (setq gptel-model   'mistralai/mistral-small-3.2-24b-instruct
+  (setq gptel-model   'google/gemini-3-flash-preview
       gptel-backend
       (gptel-make-openai "OpenRouter"               ;Any name you want
         :host "openrouter.ai"
@@ -306,6 +306,7 @@
         :stream t
         :key (getenv "OPENROUTER_API_KEY")
         :models '(mistralai/mistral-small-3.2-24b-instruct
+		  google/gemini-3-flash-preview
 		  openai/gpt-oss-120b))))
 (define-key evil-motion-state-map (kbd "SPC a c") 'gptel)
 (define-key evil-motion-state-map (kbd "SPC a m") 'gptel-menu)
@@ -402,21 +403,53 @@
   (global-evil-visualstar-mode)
   (setq evil-visualstar/persistent 1))
 
-;; (use-package aidermacs
-;;   :config
-;;   (setenv "OLLAMA_API_BASE" "http://192.168.1.10:11434")
-;;   :custom
-;;   (aidermacs-default-chat-mode 'architect)
-;;   (aidermacs-default-model "openrouter/mistralai/mistral-small-3.2-24b-instruct"))
-;; (define-key evil-motion-state-map (kbd "SPC a") 'aidermacs-transient-menu)
-;; (setq ediff-split-window-function 'split-window-vertically)
-
 (use-package eca
   :ensure t
   :straight (:host github :repo "editor-code-assistant/eca-emacs" :files ("*.el")))
 ;; (setq eca-extra-args '("--verbose" "--log-level" "debug"))
-(define-key evil-motion-state-map (kbd "SPC a e") 'eca)
+(define-key evil-motion-state-map (kbd "SPC a e") 'eca-chat-toggle-window)
 (define-key evil-motion-state-map (kbd "SPC a r") 'eca-restart)
+(defun ms/eca-rewrite-google-docstrings ()
+  "Rewrite text with Google-style docstrings using eca-rewrite."
+  (interactive)
+  (eca-rewrite "add/update docstrings following google-style"))
+(define-key evil-motion-state-map (kbd "SPC a w d") #'ms/eca-rewrite-google-docstrings)
+(define-key evil-motion-state-map (kbd "SPC a w r") 'eca-rewrite)
+
+(use-package minuet
+    :bind
+    (("M-y" . #'minuet-complete-with-minibuffer) ;; use minibuffer for completion
+     ("M-i" . #'minuet-show-suggestion) ;; use overlay for completion
+     :map minuet-active-mode-map
+     ;; These keymaps activate only when a minuet suggestion is displayed in the current buffer
+     ("M-p" . #'minuet-previous-suggestion) ;; invoke completion or cycle to next completion
+     ("M-n" . #'minuet-next-suggestion) ;; invoke completion or cycle to previous completion
+     ("M-A" . #'minuet-accept-suggestion) ;; accept whole completion
+     ;; Accept the first line of completion, or N lines with a numeric-prefix:
+     ;; e.g. C-u 2 M-a will accepts 2 lines of completion.
+     ("M-a" . #'minuet-accept-suggestion-line)
+     ("M-e" . #'minuet-dismiss-suggestion))
+
+    ;; :init
+    ;; ;; if you want to enable auto suggestion.
+    ;; ;; Note that you can manually invoke completions without enable minuet-auto-suggestion-mode
+    ;; (add-hook 'prog-mode-hook #'minuet-auto-suggestion-mode)
+
+    :config
+    (setq minuet-provider 'openai-compatible)
+    (setq minuet-request-timeout 2.5)
+    (setq minuet-auto-suggestion-throttle-delay 1.5) ;; Increase to reduce costs and avoid rate limits
+    (setq minuet-auto-suggestion-debounce-delay 0.6) ;; Increase to reduce costs and avoid rate limits
+
+    (plist-put minuet-openai-compatible-options :end-point "https://openrouter.ai/api/v1/chat/completions")
+    (plist-put minuet-openai-compatible-options :api-key (defun fetch_key () (getenv "OPENROUTER_API_KEY")))
+    (plist-put minuet-openai-compatible-options :model "qwen/qwen3-coder-next")
+
+
+    ;; Prioritize throughput for faster completion
+    (minuet-set-optional-options minuet-openai-compatible-options :provider '(:sort "throughput"))
+    (minuet-set-optional-options minuet-openai-compatible-options :max_tokens 56)
+    (minuet-set-optional-options minuet-openai-compatible-options :top_p 0.9))
 
 (use-package time-table
   :straight (time-table :type git :host github :repo "MarselScheer/time-table" :branch "time-table-buffer")
@@ -508,10 +541,10 @@
 (setq display-line-numbers-type 'relative)
 (savehist-mode 1)
 
-(require 'ansi-color)
-(defun colorize-compilation-buffer ()
-  (ansi-color-apply-on-region compilation-filter-start (point-max)))
-(add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
+(use-package fancy-compilation
+  :commands (fancy-compilation-mode))
+(with-eval-after-load 'compile
+  (fancy-compilation-mode))
 
 (use-package doom-themes)
 (load-theme 'doom-dracula t)
