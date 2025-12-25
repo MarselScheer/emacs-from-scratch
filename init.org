@@ -98,6 +98,7 @@
      	   "* FLEETING %u %? %t\norigin: file:%F"))))
      (define-key evil-motion-state-map (kbd "SPC o a") 'org-agenda)
      (define-key evil-motion-state-map (kbd "SPC o i") 'org-indent-mode)
+     (define-key evil-motion-state-map (kbd "SPC o f") 'org-cycle)
      (define-key evil-motion-state-map (kbd "SPC o c") 'org-toggle-checkbox)
      (define-key evil-motion-state-map (kbd "SPC o s") 'org-save-all-org-buffers)
      (define-key evil-motion-state-map (kbd "SPC o h") 'org-toggle-heading)
@@ -533,8 +534,10 @@ of a 'indentation-level' the cursor is in.
        :config
        ;; (setq gptel--debug t)
        ;; (setq gptel-log-level 'debug)
+       (setq gptel-default-mode #'org-mode)
+       (setq gptel-org-branching-context t)
        (setq gptel-temperature 0.0)
-       (global-set-key (kbd "C-<return>") 'gptel-send)
+       (global-set-key (kbd "C-c C-<return>") 'gptel-send)
        (add-to-list 'gptel-directives '(explain . "Explain the code to a novice programmer"))
        (gptel-make-ollama "Ollama"
          :host "localhost:11434"
@@ -549,6 +552,8 @@ of a 'indentation-level' the cursor is in.
              :key (getenv "OPENROUTER_API_KEY")
              :models '(mistralai/mistral-small-3.2-24b-instruct
      		  openai/gpt-oss-120b))))
+     (define-key evil-motion-state-map (kbd "SPC a c") 'gptel)
+     (define-key evil-motion-state-map (kbd "SPC a m") 'gptel-menu)
    #+end_src
 
 ** llm-functions
@@ -640,6 +645,8 @@ of a 'indentation-level' the cursor is in.
     :ensure t
     :straight (:host github :repo "editor-code-assistant/eca-emacs" :files ("*.el")))
   ;; (setq eca-extra-args '("--verbose" "--log-level" "debug"))
+  (define-key evil-motion-state-map (kbd "SPC a e") 'eca)
+  (define-key evil-motion-state-map (kbd "SPC a r") 'eca-restart)
 #+end_src
 * own packages
 ** time table

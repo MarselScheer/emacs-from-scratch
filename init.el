@@ -52,7 +52,7 @@
   (setq org-insert-heading-respect-content t)
   (setq org-agenda-files (directory-files "~/syncthing/orgfiles" 1 "org$"))
   (setq org-log-done "time")
-  (setq org-todo-keywords '((sequence "TODO(t)" "CONT(c)" "WAIT(w)" "|" "DONE(d)" "ABORTED(a)")))
+  (setq org-todo-keywords '((sequence "TODO(t)" "CONT(c)" "WAIT(w)" "FLEETING(f)" "|" "DONE(d)" "ABORTED(a)")))
   (setq org-log-note-headings '((done . "CLOSING NOTE %t")
 				(state . "State %-12s from %-12S %t")
 				;; (note . "Note taken on %t")
@@ -62,15 +62,29 @@
 				(redeadline . "New deadline from %S on %t")
 				(deldeadline . "Removed deadline, was %S on %t")
 				(refile . "Refiled on %t")
-				(clock-out . ""))))
+				(clock-out . "")))
+  (setq org-capture-templates
+	'(("f"                    ; ← shortcut key
+	   "Fleeting note with region" ; ← description shown in the capture menu
+	   entry                  ; ← type of item (plain text, entry, etc.)
+	   (file+headline "~/syncthing/orgfiles/20251218T150014--fleeting-notes__general.org" "Inbox")
+	   "* FLEETING %u %? %t\n  #+begin_src\n%i\n#+end_src\n origin: file:%F")
+	  ("p"                    ; ← shortcut key
+	   "Fleeting note plain"        ; ← description shown in the capture menu
+	   entry                  ; ← type of item (plain text, entry, etc.)
+	   (file+headline "~/syncthing/orgfiles/20251218T150014--fleeting-notes__general.org" "Inbox")
+	   "* FLEETING %u %? %t\norigin: file:%F"))))
 (define-key evil-motion-state-map (kbd "SPC o a") 'org-agenda)
 (define-key evil-motion-state-map (kbd "SPC o i") 'org-indent-mode)
+(define-key evil-motion-state-map (kbd "SPC o f") 'org-cycle)
 (define-key evil-motion-state-map (kbd "SPC o c") 'org-toggle-checkbox)
 (define-key evil-motion-state-map (kbd "SPC o s") 'org-save-all-org-buffers)
 (define-key evil-motion-state-map (kbd "SPC o h") 'org-toggle-heading)
 (define-key evil-motion-state-map (kbd "SPC n s") 'org-narrow-to-subtree)
 (define-key evil-motion-state-map (kbd "SPC n w") 'widen)
 (define-key evil-motion-state-map (kbd "SPC n t") 'org-show-todo-tree)
+(define-key evil-motion-state-map (kbd "SPC o f r") (lambda () (interactive) (org-capture nil "f")))
+(define-key evil-motion-state-map (kbd "SPC o f p") (lambda () (interactive) (org-capture nil "p")))
 (eval-after-load "org-agenda"
   '(progn
      (define-key org-agenda-mode-map "j" 'org-agenda-next-line)
@@ -265,11 +279,11 @@
   :config
   ;; (setq gptel--debug t)
   ;; (setq gptel-log-level 'debug)
+  (setq gptel-default-mode #'org-mode)
+  (setq gptel-org-branching-context t)
   (setq gptel-temperature 0.0)
-  (global-set-key (kbd "C-<return>") 'gptel-send)
+  (global-set-key (kbd "C-c C-<return>") 'gptel-send)
   (add-to-list 'gptel-directives '(explain . "Explain the code to a novice programmer"))
-  (gptel-make-preset 'explain
-    :system "Explain the code does to a novice programmer.")
   (gptel-make-ollama "Ollama"
     :host "localhost:11434"
     :stream t
@@ -281,7 +295,10 @@
         :endpoint "/api/v1/chat/completions"
         :stream t
         :key (getenv "OPENROUTER_API_KEY")
-        :models '(mistralai/mistral-small-3.2-24b-instruct))))
+        :models '(mistralai/mistral-small-3.2-24b-instruct
+		  openai/gpt-oss-120b))))
+(define-key evil-motion-state-map (kbd "SPC a c") 'gptel)
+(define-key evil-motion-state-map (kbd "SPC a m") 'gptel-menu)
 
 (defun ollama-only-code-curl-to-buffer (text)
   "Send TEXT to a buffer with the name BUFFER-NAME."
@@ -342,6 +359,13 @@
 (define-key evil-motion-state-map (kbd "SPC a") 'aidermacs-transient-menu)
 (setq ediff-split-window-function 'split-window-vertically)
 
+(use-package eca
+  :ensure t
+  :straight (:host github :repo "editor-code-assistant/eca-emacs" :files ("*.el")))
+;; (setq eca-extra-args '("--verbose" "--log-level" "debug"))
+(define-key evil-motion-state-map (kbd "SPC a e") 'eca)
+(define-key evil-motion-state-map (kbd "SPC a r") 'eca-restart)
+
 (use-package time-table
   :straight (time-table :type git :host github :repo "MarselScheer/time-table" :branch "time-table-buffer")
   :custom
@@ -375,6 +399,9 @@
   ;; ;; (setq dap-python-debugger 'debugpy)
 ;; (define-key python-mode-map (kbd "TAB") 'completion-at-point)
 
+(setq python-shell-interpreter "uv")
+(setq python-shell-interpreter-args "run python -i")
+
 (defvar my-intercept-mode-map (make-sparse-keymap)
   "High precedence keymap.")
 
@@ -406,6 +433,9 @@
 (define-key evil-motion-state-map (kbd "SPC m s") 'bookmark-set)
 (define-key evil-motion-state-map (kbd "SPC m j") 'bookmark-jump)
 (define-key evil-motion-state-map (kbd "SPC m J") 'bookmark-jump-other-window)
+
+(global-visual-line-mode 1)
+(global-visual-wrap-prefix-mode 1)
 
 (setq inhibit-startup-screen t)
 (scroll-bar-mode -1)
