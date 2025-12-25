@@ -526,3 +526,96 @@
 (setq delete-old-versions t)
 (setq version-control t)
 (setq kept-new-versions 7)
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; DEVELOPMENT
+
+
+(defun display-gptel-response-as-overlay(response info)
+  (interactive)
+  (let ((overlay (make-overlay (point) (+ (point) 1))))
+    (overlay-put overlay 'display response)
+    (overlay-put overlay 'face 'org-cite)
+    (let ((key (read-char "Press TAB to keep the overlay, any other key to delete it: ")))
+      (if (equal key ?\t)
+          (progn
+            (message "Overlay kept.")
+            (insert response)
+            (delete-overlay overlay))
+        (progn
+	  (insert key)
+          (delete-overlay overlay)
+          (message "Overlay deleted."))))))
+
+
+(defun extract-region ()
+  "Extract a region starting 100 lines before point and ending 100 lines after point, and print it to the minibuffer."
+  (interactive)
+  (let* ((start-line (save-excursion (beginning-of-line) (line-number-at-pos)))
+         (end-line start-line)
+         (start-pos (save-excursion (beginning-of-line) (point)))
+         (end-pos (save-excursion (end-of-line) (point)))
+         (region-before (save-excursion
+                           (goto-line (- start-line 100))
+                           (beginning-of-line)
+                           (buffer-substring-no-properties (point) start-pos)))
+         (region-after (save-excursion
+                          (goto-line (+ end-line 100))
+                          (end-of-line)
+                          (buffer-substring-no-properties end-pos (point)))))
+    (concat region-before "# AI: complete here\n" region-after)))
+
+(defun gt()
+  (interactive)
+  (gptel-request (extract-region)
+  ;; (gptel-request (buffer-string)
+    :system "You are an experienced python programmer. You make short proposals for completing the position marked by `# AI: complete here` and only for that position. Response with code or docstrings only, no additional explanations needed! Dont touch the other code that might be send. It is forbidden to use ```python tags because this will ruin our code base!"
+    :callback #'display-gptel-response-as-overlay))
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((python . t)
+   (emacs-lisp . t)))
+(setq org-babel-python-command "uv run python")
+(setq org-confirm-babel-evaluate
+      (lambda (lang body)
+        (not (string= lang "python"))))   ;; ask only when not Python
+
+
+
+(use-package minuet
+    :bind
+    (("M-y" . #'minuet-complete-with-minibuffer) ;; use minibuffer for completion
+     ("M-i" . #'minuet-show-suggestion) ;; use overlay for completion
+     :map minuet-active-mode-map
+     ;; These keymaps activate only when a minuet suggestion is displayed in the current buffer
+     ("M-p" . #'minuet-previous-suggestion) ;; invoke completion or cycle to next completion
+     ("M-n" . #'minuet-next-suggestion) ;; invoke completion or cycle to previous completion
+     ("M-A" . #'minuet-accept-suggestion) ;; accept whole completion
+     ;; Accept the first line of completion, or N lines with a numeric-prefix:
+     ;; e.g. C-u 2 M-a will accepts 2 lines of completion.
+     ("M-a" . #'minuet-accept-suggestion-line)
+     ("M-e" . #'minuet-dismiss-suggestion))
+
+    ;; :init
+    ;; ;; if you want to enable auto suggestion.
+    ;; ;; Note that you can manually invoke completions without enable minuet-auto-suggestion-mode
+    ;; (add-hook 'prog-mode-hook #'minuet-auto-suggestion-mode)
+
+    :config
+    (setq minuet-provider 'openai-compatible)
+    (setq minuet-request-timeout 2.5)
+    (setq minuet-auto-suggestion-throttle-delay 1.5) ;; Increase to reduce costs and avoid rate limits
+    (setq minuet-auto-suggestion-debounce-delay 0.6) ;; Increase to reduce costs and avoid rate limits
+
+    (plist-put minuet-openai-compatible-options :end-point "https://openrouter.ai/api/v1/chat/completions")
+    (plist-put minuet-openai-compatible-options :api-key (defun fetch_key () (getenv "OPENROUTER_API_KEY")))
+    (plist-put minuet-openai-compatible-options :model "mistralai/devstral-small")
+
+
+    ;; Prioritize throughput for faster completion
+    (minuet-set-optional-options minuet-openai-compatible-options :provider '(:sort "throughput"))
+    (minuet-set-optional-options minuet-openai-compatible-options :max_tokens 56)
+    (minuet-set-optional-options minuet-openai-compatible-options :top_p 0.9))
