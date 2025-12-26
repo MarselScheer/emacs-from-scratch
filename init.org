@@ -248,12 +248,14 @@ commands
 #        :hook (prog-mode . rainbow-delimiters-mode))
 #    #+end_src
 
-** helpful (more elisp help information)
+** helpful (more elisp help information) combined with elisp-demos to show examples in help-buffer
 
    #+begin_src emacs-lisp
      (use-package helpful
        :custom (counsel-describe-function-function #'helpful-callable)
        :bind ([remap describe-function] . #'helpful-callable))
+     (use-package elisp-demos)
+     (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update)
    #+end_src
    
 ** projectile (Group buffer, files by project)

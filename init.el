@@ -162,6 +162,8 @@
 (use-package helpful
   :custom (counsel-describe-function-function #'helpful-callable)
   :bind ([remap describe-function] . #'helpful-callable))
+(use-package elisp-demos)
+(advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update)
 
 (use-package projectile
   :config (projectile-mode))
