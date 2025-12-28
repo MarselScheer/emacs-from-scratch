@@ -52,7 +52,7 @@
   (setq org-insert-heading-respect-content t)
   (setq org-agenda-files (directory-files "~/syncthing/orgfiles" 1 "org$"))
   (setq org-log-done "time")
-  (setq org-todo-keywords '((sequence "TODO(t)" "CONT(c)" "WAIT(w)" "FLEETING(f)" "|" "DONE(d)" "ABORTED(a)")))
+  (setq org-todo-keywords '((sequence "TODO(t)" "CONT(c)" "WAIT(w)" "REMINDER(r)" "FLEETING(f)" "|" "DONE(d)" "ABORTED(a)")))
   (setq org-log-note-headings '((done . "CLOSING NOTE %t")
 				(state . "State %-12s from %-12S %t")
 				;; (note . "Note taken on %t")
