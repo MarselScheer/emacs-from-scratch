@@ -52,7 +52,7 @@
   (setq org-insert-heading-respect-content t)
   (setq org-agenda-files (directory-files "~/syncthing/orgfiles" 1 "org$"))
   (setq org-log-done "time")
-  (setq org-todo-keywords '((sequence "TODO(t)" "CONT(c)" "WAIT(w)" "|" "DONE(d)" "ABORTED(a)")))
+  (setq org-todo-keywords '((sequence "TODO(t)" "CONT(c)" "WAIT(w)" "REMINDER(r)" "FLEETING(f)" "|" "DONE(d)" "ABORTED(a)")))
   (setq org-log-note-headings '((done . "CLOSING NOTE %t")
 				(state . "State %-12s from %-12S %t")
 				;; (note . "Note taken on %t")
@@ -62,15 +62,29 @@
 				(redeadline . "New deadline from %S on %t")
 				(deldeadline . "Removed deadline, was %S on %t")
 				(refile . "Refiled on %t")
-				(clock-out . ""))))
+				(clock-out . "")))
+  (setq org-capture-templates
+	'(("f"                    ; ← shortcut key
+	   "Fleeting note with region" ; ← description shown in the capture menu
+	   entry                  ; ← type of item (plain text, entry, etc.)
+	   (file+headline "~/syncthing/orgfiles/20251218T150014--fleeting-notes__general.org" "Inbox")
+	   "* FLEETING %u %? %t\n  #+begin_src\n%i\n#+end_src\n origin: file:%F")
+	  ("p"                    ; ← shortcut key
+	   "Fleeting note plain"        ; ← description shown in the capture menu
+	   entry                  ; ← type of item (plain text, entry, etc.)
+	   (file+headline "~/syncthing/orgfiles/20251218T150014--fleeting-notes__general.org" "Inbox")
+	   "* FLEETING %u %? %t\norigin: file:%F"))))
 (define-key evil-motion-state-map (kbd "SPC o a") 'org-agenda)
 (define-key evil-motion-state-map (kbd "SPC o i") 'org-indent-mode)
+(define-key evil-motion-state-map (kbd "SPC o f") 'org-cycle)
 (define-key evil-motion-state-map (kbd "SPC o c") 'org-toggle-checkbox)
 (define-key evil-motion-state-map (kbd "SPC o s") 'org-save-all-org-buffers)
 (define-key evil-motion-state-map (kbd "SPC o h") 'org-toggle-heading)
 (define-key evil-motion-state-map (kbd "SPC n s") 'org-narrow-to-subtree)
 (define-key evil-motion-state-map (kbd "SPC n w") 'widen)
 (define-key evil-motion-state-map (kbd "SPC n t") 'org-show-todo-tree)
+(define-key evil-motion-state-map (kbd "SPC o n r") (lambda () (interactive) (org-capture nil "f")))
+(define-key evil-motion-state-map (kbd "SPC o n p") (lambda () (interactive) (org-capture nil "p")))
 (eval-after-load "org-agenda"
   '(progn
      (define-key org-agenda-mode-map "j" 'org-agenda-next-line)
@@ -148,6 +162,8 @@
 (use-package helpful
   :custom (counsel-describe-function-function #'helpful-callable)
   :bind ([remap describe-function] . #'helpful-callable))
+(use-package elisp-demos)
+(advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update)
 
 (use-package projectile
   :config (projectile-mode))
@@ -158,6 +174,8 @@
 
 (use-package magit)
 (define-key evil-motion-state-map (kbd "SPC g g") 'magit-status)
+(define-key evil-motion-state-map (kbd "SPC g b") 'magit-blame)
+(define-key evil-motion-state-map (kbd "SPC g d") 'magit-diff-dwim)
 
 (use-package diff-hl
   :config (global-diff-hl-mode))
@@ -191,6 +209,7 @@
 (define-key evil-motion-state-map (kbd "SPC l d") 'lsp-describe-thing-at-point)
 (define-key evil-motion-state-map (kbd "SPC l r") 'lsp-rename)
 (define-key evil-motion-state-map (kbd "SPC l f") 'lsp-find-definition)
+(define-key evil-motion-state-map (kbd "SPC l u") 'lsp-find-references)
 (define-key evil-motion-state-map (kbd "SPC l c") 'comment-or-uncomment-region)
 
 ;; Enables "pop-up's" with additional information about
@@ -227,11 +246,11 @@
     ;; `tempel-expand' *before* the main programming mode Capf, such
     ;; that it will be tried first.
     (setq-local completion-at-point-functions
-                (cons #'tempel-expand
-                      completion-at-point-functions)))
+		(cons #'tempel-expand
+		      (remove #'tempel-expand completion-at-point-functions))))
 
   ;; (add-hook 'conf-mode-hook 'tempel-setup-capf)
-  ;; (add-hook 'prog-mode-hook 'tempel-setup-capf)
+  (add-hook 'lsp-completion-mode-hook 'tempel-setup-capf)
   (add-hook 'text-mode-hook 'tempel-setup-capf)
 
   ;; Optionally make the Tempel templates available to Abbrev,
@@ -262,22 +281,68 @@
   :config
   ;; (setq gptel--debug t)
   ;; (setq gptel-log-level 'debug)
+  (setq gptel-default-mode #'org-mode)
+  (setq gptel-org-branching-context t)
   (setq gptel-temperature 0.0)
-  (global-set-key (kbd "C-c <RET>") 'gptel-send)
-  (gptel-make-ollama "Ollama0"
-    :host "ollama:11434"
+  (global-set-key (kbd "C-c C-<return>") 'gptel-send)
+  (add-to-list 'gptel-directives '(explain . "Explain the code to a novice programmer"))
+  (gptel-make-ollama "Ollama"
+    :host "localhost:11434"
     :stream t
-    :models '(gemma3:4b))
-  (gptel-make-ollama "Ollama1"
-    :host "ollama:11434"
-    :stream t
-    :models '(cogito:8b))
-  (setq
-   gptel-model 'codellama:7b
-   gptel-backend (gptel-make-ollama "Ollama2"
-		   :host "localhost:11434"
-		   :stream t
-		   :models '(codellama:7b))))
+    :models '(codellama:7b))
+  (setq gptel-model   'mistralai/mistral-small-3.2-24b-instruct
+      gptel-backend
+      (gptel-make-openai "OpenRouter"               ;Any name you want
+        :host "openrouter.ai"
+        :endpoint "/api/v1/chat/completions"
+        :stream t
+        :key (getenv "OPENROUTER_API_KEY")
+        :models '(mistralai/mistral-small-3.2-24b-instruct
+		  openai/gpt-oss-120b))))
+(define-key evil-motion-state-map (kbd "SPC a c") 'gptel)
+(define-key evil-motion-state-map (kbd "SPC a m") 'gptel-menu)
+
+(use-package ragmacs
+   :ensure t
+   :straight (:host github :repo "positron-solutions/ragmacs")
+   :after gptel
+   :defer
+   :init
+   (gptel-make-preset 'introspect
+     :pre (lambda () (require 'ragmacs))
+     :system
+     "You are pair programming with the user in Emacs and on Emacs.
+
+ Your job is to dive into Elisp code and understand the APIs and
+ structure of elisp libraries and Emacs.  Use the provided tools to do
+ so, but do not make duplicate tool calls for information already
+ available in the chat.
+
+ <tone>
+ 1. Be terse and to the point.  Speak directly.
+ 2. Explain your reasoning.
+ 3. Do NOT hedge or qualify.
+ 4. If you don't know, say you don't know.
+ 5. Do not offer unprompted advice or clarifications.
+ 6. Never apologize.
+ 7. Do NOT summarize your answers.
+ </tone>
+
+ <code_generation>
+ When generating code:
+ 1. Always check that functions or variables you use in your code exist.
+ 2. Also check their calling convention and function-arity before you use them.
+ 3. Write code that can be tested by evaluation, and offer to evaluate
+ code using the `elisp_eval` tool.
+ </code_generation>
+
+ <formatting>
+ 1. When referring to code symbols (variables, functions, tags etc) enclose them in markdown quotes.
+    Examples: `read_file`, `getResponse(url, callback)`
+    Example: `<details>...</details>`
+ 2. If you use LaTeX notation, enclose math in \( and \), or \[ and \] delimiters.
+ </formatting>"
+     :tools '("introspection")))
 
 (defun ollama-only-code-curl-to-buffer (text)
   "Send TEXT to a buffer with the name BUFFER-NAME."
@@ -329,6 +394,22 @@
   (global-evil-visualstar-mode)
   (setq evil-visualstar/persistent 1))
 
+;; (use-package aidermacs
+;;   :config
+;;   (setenv "OLLAMA_API_BASE" "http://192.168.1.10:11434")
+;;   :custom
+;;   (aidermacs-default-chat-mode 'architect)
+;;   (aidermacs-default-model "openrouter/mistralai/mistral-small-3.2-24b-instruct"))
+;; (define-key evil-motion-state-map (kbd "SPC a") 'aidermacs-transient-menu)
+;; (setq ediff-split-window-function 'split-window-vertically)
+
+(use-package eca
+  :ensure t
+  :straight (:host github :repo "editor-code-assistant/eca-emacs" :files ("*.el")))
+;; (setq eca-extra-args '("--verbose" "--log-level" "debug"))
+(define-key evil-motion-state-map (kbd "SPC a e") 'eca)
+(define-key evil-motion-state-map (kbd "SPC a r") 'eca-restart)
+
 (use-package time-table
   :straight (time-table :type git :host github :repo "MarselScheer/time-table" :branch "time-table-buffer")
   :custom
@@ -342,8 +423,11 @@
 (define-key evil-motion-state-map (kbd "SPC t b") 'time-table-find-tracking-file)
 (define-key evil-motion-state-map (kbd "SPC t e") 'time-table-end-tracking)
 
-(use-package python-black
-  :hook (python-mode . python-black-on-save-mode))
+(use-package flymake-ruff)
+(add-hook 'python-mode-hook #'flymake-ruff-load)
+
+(use-package ruff-format)
+(add-hook 'python-mode-hook 'ruff-format-on-save-mode)
 
 (use-package python-mode
   :hook (python-mode . (lambda ()
@@ -358,6 +442,9 @@
   ;; (setq py-split-window-on-execute nil))
   ;; ;; (setq dap-python-debugger 'debugpy)
 ;; (define-key python-mode-map (kbd "TAB") 'completion-at-point)
+
+(setq python-shell-interpreter "uv")
+(setq python-shell-interpreter-args "run python -i")
 
 (defvar my-intercept-mode-map (make-sparse-keymap)
   "High precedence keymap.")
@@ -386,6 +473,13 @@
   (kbd "SPC b o") 'consult-buffer-other-window)
 (evil-define-key 'normal my-intercept-mode-map
   (kbd "SPC w") 'evil-window-map)
+
+(define-key evil-motion-state-map (kbd "SPC m s") 'bookmark-set)
+(define-key evil-motion-state-map (kbd "SPC m j") 'bookmark-jump)
+(define-key evil-motion-state-map (kbd "SPC m J") 'bookmark-jump-other-window)
+
+(global-visual-line-mode 1)
+(global-visual-wrap-prefix-mode 1)
 
 (setq inhibit-startup-screen t)
 (scroll-bar-mode -1)
@@ -427,3 +521,8 @@
 ;;  :init (doom-modeline-mode 0))
 (use-package telephone-line)
 (telephone-line-mode 1)
+
+(setq backup-directory-alist `(("." . ,(expand-file-name "tmp/backups/" user-emacs-directory))))
+(setq delete-old-versions t)
+(setq version-control t)
+(setq kept-new-versions 7)

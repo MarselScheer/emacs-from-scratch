@@ -1,4 +1,4 @@
-text-mode
+fundamental-mode
 
 (box "┌─" (make-string (length str) ?─) "─┐" n
      "│ " (p "one line text" str)       " │" n
@@ -10,6 +10,12 @@ org-mode
 (t (format-time-string "TODO [%Y-%m-%d %a]: ") q (format-time-string " <%Y-%m-%d %a>") :post (progn (org-toggle-heading) (org-metaleft)))
 (ts (format-time-string "TODO [%Y-%m-%d %a]: ") q (format-time-string " <%Y-%m-%d %a>") :post (org-toggle-heading))
 (c (format-time-string "=com [%Y-%m-%d %a] --") q "=")
+
+python-mode
+(a "assert 0 == 1" r)
+(pp "import pprint; pprint.pprint(" r ")")
+(li "logger.info(" r ")")
+(lif "logger.info(f'{" r "=}')")
 
 ;; Local Variables:
 ;; mode: lisp-data
