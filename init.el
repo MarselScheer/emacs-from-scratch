@@ -68,12 +68,12 @@
 	   "Fleeting note with region" ; ← description shown in the capture menu
 	   entry                  ; ← type of item (plain text, entry, etc.)
 	   (file+headline "~/syncthing/orgfiles/20251218T150014--fleeting-notes__general.org" "Inbox")
-	   "* FLEETING %u %? %t\n  #+begin_src\n%i\n#+end_src\n origin: file:%F")
+	   "* FLEETING %u: %? %t\n  #+begin_src\n%i\n#+end_src\n origin: file:%F")
 	  ("p"                    ; ← shortcut key
 	   "Fleeting note plain"        ; ← description shown in the capture menu
 	   entry                  ; ← type of item (plain text, entry, etc.)
 	   (file+headline "~/syncthing/orgfiles/20251218T150014--fleeting-notes__general.org" "Inbox")
-	   "* FLEETING %u %? %t\norigin: file:%F"))))
+	   "* FLEETING %u: %? %t\norigin: file:%F"))))
 (define-key evil-motion-state-map (kbd "SPC o a") 'org-agenda)
 (define-key evil-motion-state-map (kbd "SPC o i") 'org-indent-mode)
 (define-key evil-motion-state-map (kbd "SPC o f") 'org-cycle)
@@ -165,12 +165,20 @@
 (use-package elisp-demos)
 (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update)
 
-(use-package projectile
-  :config (projectile-mode))
-(define-key evil-motion-state-map (kbd "SPC p") 'projectile-command-map)
-;; need to define keybinding for consult after the projectile commands
-;; because SPC p is already referring to projectile-command-map
+(defun ms/save-buffer-and-recompile ()
+  "Saves the current buffer and runs project-recompile"
+  (interactive)
+  (progn
+    (save-buffer)
+    (project-recompile)))
 (define-key evil-motion-state-map (kbd "SPC p s r") 'consult-ripgrep)
+(define-key evil-motion-state-map (kbd "SPC p c") 'project-compile)
+(define-key evil-motion-state-map (kbd "SPC p r") 'ms/save-buffer-and-recompile)
+(define-key evil-motion-state-map (kbd "SPC p p") 'project-switch-project)
+(define-key evil-motion-state-map (kbd "SPC p k") 'project-kill-buffers)
+(define-key evil-motion-state-map (kbd "SPC p b") 'consult-project-buffer)
+(define-key evil-motion-state-map (kbd "SPC p f") 'project-find-file)
+(setq project-vc-extra-root-markers '(".project.el"))
 
 (use-package magit)
 (define-key evil-motion-state-map (kbd "SPC g g") 'magit-status)

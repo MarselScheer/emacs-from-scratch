@@ -7,9 +7,11 @@ fundamental-mode
 
 org-mode
 (e "#+begin_src emacs-lisp" n r n "#+end_src" :post (org-edit-src-code))
+(s "#+begin_src" n r n "#+end_src")
 (t (format-time-string "TODO [%Y-%m-%d %a]: ") q (format-time-string " <%Y-%m-%d %a>") :post (progn (org-toggle-heading) (org-metaleft)))
 (ts (format-time-string "TODO [%Y-%m-%d %a]: ") q (format-time-string " <%Y-%m-%d %a>") :post (org-toggle-heading))
 (c (format-time-string "=com [%Y-%m-%d %a] --") q "=")
+(cb "- [ ] " r)
 
 python-mode
 (a "assert 0 == 1" r)
