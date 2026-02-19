@@ -95,7 +95,15 @@
      	   "Fleeting note plain"        ; ← description shown in the capture menu
      	   entry                  ; ← type of item (plain text, entry, etc.)
      	   (file+headline "~/syncthing/orgfiles/20251218T150014--fleeting-notes__general.org" "Inbox")
-     	   "* FLEETING %u: %? %t\norigin: file:%F"))))
+     	   "* FLEETING %u: %? %t\norigin: file:%F")))
+       (setq org-confirm-babel-evaluate
+           (lambda (lang body)
+             (not (string= lang "python")))))
+     (with-eval-after-load 'org
+       (org-babel-do-load-languages
+        'org-babel-load-languages
+        '((python . t))))
+
      (define-key evil-motion-state-map (kbd "SPC o a") 'org-agenda)
      (define-key evil-motion-state-map (kbd "SPC o i") 'org-indent-mode)
      (define-key evil-motion-state-map (kbd "SPC o f") 'org-cycle)
