@@ -724,8 +724,18 @@ of a 'indentation-level' the cursor is in.
   (defun ms/eca-rewrite-google-docstrings ()
     "Rewrite text with Google-style docstrings using eca-rewrite."
     (interactive)
-    (eca-rewrite "add/update docstrings following google-style"))
+    (eca-rewrite "add/update docstrings following google-style. Dont update the code itself!"))
   (define-key evil-motion-state-map (kbd "SPC a w d") #'ms/eca-rewrite-google-docstrings)
+    (defun ms/eca-rewrite-by-inline-comments ()
+      "Rewrite code based on inline comments using eca-rewrite."
+      (interactive)
+      (eca-rewrite "follow the instructions closely given by `# AI:`. In case of multiple lines marked with `# AI:` follow the instructions that are most important for the functionality of the code."))
+  (define-key evil-motion-state-map (kbd "SPC a w i") #'ms/eca-rewrite-by-inline-comments)
+    (defun ms/eca-rewrite-add-implementation-shortcomings ()
+      "Add shortcomings in the implementation to the code marked with `# AI:` using eca-rewrite"
+      (interactive)
+      (eca-rewrite "Add comments to the code about shortcomings in the implementation. Dont update the code itself. Focus on shortcomings that could lead to bugs or maintenance issues. Make the comments short and concise. Add them in a separate line directly above the code they refer to and start the comment with `# AI:`."))
+  (define-key evil-motion-state-map (kbd "SPC a w s") #'ms/eca-rewrite-add-implementation-shortcomings)
   (define-key evil-motion-state-map (kbd "SPC a w r") 'eca-rewrite)
 #+end_src
 ** minuet (inline completion)
