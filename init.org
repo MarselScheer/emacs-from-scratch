@@ -833,10 +833,12 @@ of a 'indentation-level' the cursor is in.
    #+end_src
 
    #+begin_src emacs-lisp
-     (use-package python-mode
-       :hook (python-mode . (lambda ()
-     			 (define-key python-mode-map (kbd "TAB") 'completion-at-point)
-     			 (lsp-deferred))))
+     ;; in order to configure the built-in python mode use
+     ;; (use-package python)
+     ;; (use-package python-mode
+     ;;   :hook (python-mode . (lambda ()
+     ;; 			 (define-key python-mode-map (kbd "TAB") 'completion-at-point)
+     ;; 			 (lsp-deferred))))
        ;; :config
        ;; ;; (require 'dap-python)
        ;; (evil-define-key 'normal 'python-mode-map (kbd "SPC r i") 'py-switch-to-shell)
