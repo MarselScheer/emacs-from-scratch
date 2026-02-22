@@ -193,6 +193,19 @@
 (define-key evil-motion-state-map (kbd "SPC g b") 'magit-blame)
 (define-key evil-motion-state-map (kbd "SPC g d") 'magit-diff-dwim)
 
+(defun ms/generate-git-commit-msg ()
+  "Generate a commit message using git diff and a python script."
+  (interactive)
+  (let ((diff-file "/tmp/git-diff")
+        (msg-file "/tmp/commit-msg"))
+    ;; print diff-file
+    (shell-command (format "git diff --staged > %s" diff-file))
+    (shell-command (format "cd /home/m/.emacs.d/dspy-commit && uv run main.py %s %s" diff-file msg-file))
+    (if (file-exists-p msg-file)
+        (insert-file-contents msg-file)
+      (message "Error: %s not found" msg-file))))
+(define-key evil-motion-state-map (kbd "SPC g m") 'ms/generate-git-commit-msg)
+
 (use-package diff-hl
   :config (global-diff-hl-mode))
 
@@ -268,6 +281,7 @@
   ;; (add-hook 'conf-mode-hook 'tempel-setup-capf)
   (add-hook 'lsp-completion-mode-hook 'tempel-setup-capf)
   (add-hook 'text-mode-hook 'tempel-setup-capf)
+  (add-hook 'eshell-mode-hook 'tempel-setup-capf)
 
   ;; Optionally make the Tempel templates available to Abbrev,
   ;; either locally or globally. `expand-abbrev' is bound to C-x '.

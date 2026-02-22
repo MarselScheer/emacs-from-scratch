@@ -19,6 +19,8 @@ python-mode
 (li "logger.info(" r ")")
 (lif "logger.info(f'{" r "=}')")
 
+eshell-mode
+(de "setxkbmap de" r)
 ;; Local Variables:
 ;; mode: lisp-data
 ;; outline-regexp: "[a-z]"
