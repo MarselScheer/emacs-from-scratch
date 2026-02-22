@@ -225,6 +225,7 @@
 	       '(orderless))) ;; Configure orderless
   :hook
   (lsp-completion-mode . my/lsp-mode-setup-completion)
+  (python-mode . lsp) ;; install ty via uv
   :config
   (lsp-enable-which-key-integration t)
   (setq read-process-output-max (* 2 1024 1024))
@@ -247,11 +248,11 @@
 (use-package lsp-ui
   :hook (lsp-mode . lsp-ui-mode))
 
-(use-package lsp-pyright
-  :ensure t
-  :hook (python-mode . (lambda ()
-			 (require 'lsp-pyright)
-			 (lsp))))  ; or lsp-deferred
+;; (use-package lsp-pyright
+;;   :ensure t
+;;   :hook (python-mode . (lambda ()
+;; 			 (require 'lsp-pyright)
+;; 			 (lsp))))  ; or lsp-deferred
 
 (use-package flycheck)
 
@@ -506,7 +507,10 @@
 (add-hook 'python-mode-hook 'ruff-format-on-save-mode)
 
 ;; in order to configure the built-in python mode use
-;; (use-package python)
+(use-package python
+  :config
+  (define-key python-mode-map (kbd "<backtab>") 'indent-for-tab-command)
+  (define-key python-mode-map (kbd "TAB") 'completion-at-point))
 ;; (use-package python-mode
 ;;   :hook (python-mode . (lambda ()
 ;; 			 (define-key python-mode-map (kbd "TAB") 'completion-at-point)
