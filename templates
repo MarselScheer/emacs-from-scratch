@@ -21,6 +21,11 @@ python-mode
 
 eshell-mode
 (de "setxkbmap de" r)
+
+eca-chat-mode
+(d "maintain docstring for file")
+(r "review last commit")
+
 ;; Local Variables:
 ;; mode: lisp-data
 ;; outline-regexp: "[a-z]"
