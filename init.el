@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;; instructions from the straight README
 (defvar bootstrap-version)
 (let ((bootstrap-file
@@ -197,14 +198,28 @@
 (defun ms/generate-git-commit-msg ()
   "Generate a commit message using git diff and a python script."
   (interactive)
-  (let ((diff-file "/tmp/git-diff")
-        (msg-file "/tmp/commit-msg"))
-    ;; print diff-file
+  (let* ((diff-file "/tmp/git-diff")
+	 (msg-file "/tmp/commit-msg")
+	 (cmd (format "cd /home/m/.emacs.d/dspy-commit && uv run main.py %s %s" diff-file msg-file))
+	 (target-buffer (current-buffer))
+	 (sentinel (lambda (proc event)
+		     (when (and (eq (process-status proc) 'exit)
+				(zerop (process-exit-status proc))
+				(file-exists-p msg-file))
+		       (with-current-buffer target-buffer
+			 (goto-char (point-min))
+			 (insert-file-contents msg-file))
+		       (message "Commit message generated")))))
+    ;; Generate diff file synchronously (fast)
     (shell-command (format "git diff --staged > %s" diff-file))
-    (shell-command (format "cd /home/m/.emacs.d/dspy-commit && uv run main.py %s %s" diff-file msg-file))
-    (if (file-exists-p msg-file)
-        (insert-file-contents msg-file)
-      (message "Error: %s not found" msg-file))))
+    ;; Run the Python script asynchronously using make-process
+    (let ((proc (make-process
+		 :name "gen-commit-msg"
+		 :command (list "sh" "-c" cmd)
+		 :noquery t
+		 :sentinel sentinel)))
+      ;; Set the process to run in the background without blocking
+      (set-process-filter proc 'ignore))))
 (define-key evil-motion-state-map (kbd "SPC g m") 'ms/generate-git-commit-msg)
 
 (use-package diff-hl
