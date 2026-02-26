@@ -131,6 +131,11 @@
   :config
   (corfu-terminal-mode +1))
 
+(use-package cape
+  :init
+  (add-hook 'prog-mode-hook (lambda () (add-hook 'completion-at-point-functions #'cape-file nil t)))
+)
+
 (use-package emacs
   :custom
   ;; TAB cycle if there are only few candidates
@@ -294,8 +299,8 @@
     ;; `tempel-expand' *before* the main programming mode Capf, such
     ;; that it will be tried first.
     (setq-local completion-at-point-functions
-		(cons #'tempel-expand
-		      (remove #'tempel-expand completion-at-point-functions))))
+		(cons #'tempel-expand (cons #'cape-file
+		      (remove #'tempel-expand completion-at-point-functions)))))
 
   ;; (add-hook 'conf-mode-hook 'tempel-setup-capf)
   (add-hook 'lsp-completion-mode-hook 'tempel-setup-capf)
