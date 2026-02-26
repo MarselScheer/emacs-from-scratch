@@ -25,6 +25,7 @@ eshell-mode
 eca-chat-mode
 (d "maintain docstring for file")
 (r "review last commit")
+(t "load tdd-skill, run `make test` and start next implementation")
 
 ;; Local Variables:
 ;; mode: lisp-data
