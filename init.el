@@ -214,6 +214,10 @@
 		       (with-current-buffer target-buffer
 			 (goto-char (point-min))
 			 (insert-file-contents msg-file))
+		       (let ((orig-bg (face-remap-add-relative 'default :background "DarkBlue")))
+			 (run-with-timer 0.5 nil
+					 (lambda (bg) (face-remap-remove-relative bg))
+					 orig-bg))
 		       (message "Commit message generated")))))
     ;; Generate diff file synchronously (fast)
     (shell-command (format "git diff --staged > %s" diff-file))
