@@ -282,6 +282,7 @@ commands
      (define-key evil-motion-state-map (kbd "SPC p k") 'project-kill-buffers)
      (define-key evil-motion-state-map (kbd "SPC p b") 'consult-project-buffer)
      (define-key evil-motion-state-map (kbd "SPC p f") 'project-find-file)
+     (define-key evil-motion-state-map (kbd "SPC p e") 'project-eshell)
      (setq project-vc-extra-root-markers '(".project.el"))
    #+end_src
 
@@ -351,6 +352,7 @@ various language servers for instance for python or R.
      	       '(orderless))) ;; Configure orderless
        :hook
        (lsp-completion-mode . my/lsp-mode-setup-completion)
+       (python-mode . lsp) ;; install ty via uv
        :config
        (lsp-enable-which-key-integration t)
        (setq read-process-output-max (* 2 1024 1024))
@@ -373,19 +375,19 @@ various language servers for instance for python or R.
      (use-package lsp-ui
        :hook (lsp-mode . lsp-ui-mode))
 
-     (use-package lsp-pyright
-       :ensure t
-       :hook (python-mode . (lambda ()
-     			 (require 'lsp-pyright)
-     			 (lsp))))  ; or lsp-deferred
+     ;; (use-package lsp-pyright
+     ;;   :ensure t
+     ;;   :hook (python-mode . (lambda ()
+     ;; 			 (require 'lsp-pyright)
+     ;; 			 (lsp))))  ; or lsp-deferred
    #+end_src
 
-** flycheck (deactivated)
+** flycheck
 
 # Online linting of source code
-#    #+begin_src emacs-lisp
-#      (use-package flycheck)
-#    #+end_src
+   #+begin_src emacs-lisp
+     (use-package flycheck)
+   #+end_src
 
 Text completion 
 # ** company-mode (deactivated use vertico and orderless)
@@ -574,15 +576,17 @@ of a 'indentation-level' the cursor is in.
          :stream t
          :models '(codellama:7b))
        (setq gptel-model   'google/gemini-3-flash-preview
-           gptel-backend
-           (gptel-make-openai "OpenRouter"               ;Any name you want
-             :host "openrouter.ai"
-             :endpoint "/api/v1/chat/completions"
-             :stream t
-             :key (getenv "OPENROUTER_API_KEY")
-             :models '(mistralai/mistral-small-3.2-24b-instruct
-     		  google/gemini-3-flash-preview
-     		  openai/gpt-oss-120b))))
+     	gptel-backend
+     	(gptel-make-openai "OpenRouter"               ;Any name you want
+     	  :host "openrouter.ai"
+     	  :endpoint "/api/v1/chat/completions"
+     	  :stream t
+     	  :key (getenv "OPENROUTER_API_KEY")
+     	  :models '(mistralai/mistral-small-3.2-24b-instruct
+     		    google/gemini-3-flash-preview
+     		    minimax/minimax-m2.1
+     		    minimax/minimax-m2.5
+     		    openai/gpt-oss-120b))))
      (define-key evil-motion-state-map (kbd "SPC a c") 'gptel)
      (define-key evil-motion-state-map (kbd "SPC a m") 'gptel-menu)
    #+end_src
@@ -721,11 +725,22 @@ of a 'indentation-level' the cursor is in.
   ;; (setq eca-extra-args '("--verbose" "--log-level" "debug"))
   (define-key evil-motion-state-map (kbd "SPC a e") 'eca-chat-toggle-window)
   (define-key evil-motion-state-map (kbd "SPC a r") 'eca-restart)
+  (define-key evil-motion-state-map (kbd "SPC a s") 'eca-stop)
   (defun ms/eca-rewrite-google-docstrings ()
     "Rewrite text with Google-style docstrings using eca-rewrite."
     (interactive)
-    (eca-rewrite "add/update docstrings following google-style"))
+    (eca-rewrite "add/update docstrings following google-style. Dont update the code itself!"))
   (define-key evil-motion-state-map (kbd "SPC a w d") #'ms/eca-rewrite-google-docstrings)
+    (defun ms/eca-rewrite-by-inline-comments ()
+      "Rewrite code based on inline comments using eca-rewrite."
+      (interactive)
+      (eca-rewrite "follow the instructions closely given by `# AI:`. In case of multiple lines marked with `# AI:` follow the instructions that are most important for the functionality of the code."))
+  (define-key evil-motion-state-map (kbd "SPC a w i") #'ms/eca-rewrite-by-inline-comments)
+    (defun ms/eca-rewrite-add-implementation-shortcomings ()
+      "Add shortcomings in the implementation to the code marked with `# AI:` using eca-rewrite"
+      (interactive)
+      (eca-rewrite "Add comments to the code about shortcomings in the implementation. Dont update the code itself. Focus on shortcomings that could lead to bugs or maintenance issues. Make the comments short and concise. Add them in a separate line directly above the code they refer to and start the comment with `# AI:`."))
+  (define-key evil-motion-state-map (kbd "SPC a w s") #'ms/eca-rewrite-add-implementation-shortcomings)
   (define-key evil-motion-state-map (kbd "SPC a w r") 'eca-rewrite)
 #+end_src
 ** minuet (inline completion)
@@ -757,7 +772,7 @@ of a 'indentation-level' the cursor is in.
 
       (plist-put minuet-openai-compatible-options :end-point "https://openrouter.ai/api/v1/chat/completions")
       (plist-put minuet-openai-compatible-options :api-key (defun fetch_key () (getenv "OPENROUTER_API_KEY")))
-      (plist-put minuet-openai-compatible-options :model "qwen/qwen3-coder-next")
+      (plist-put minuet-openai-compatible-options :model "qwen/qwen3-coder")
 
 
       ;; Prioritize throughput for faster completion
@@ -824,19 +839,26 @@ of a 'indentation-level' the cursor is in.
    #     (projectile-save-project-buffers)
    #     (py-execute-region beg end))
    # #+end_src
-   #+begin_src emacs-lisp
-     (use-package flymake-ruff)
-     (add-hook 'python-mode-hook #'flymake-ruff-load)
+   # #+begin_src emacs-lisp
+   #   (use-package flymake-ruff)
+   #   (add-hook 'python-mode-hook #'flymake-ruff-load)
+   # #+end_src
 
+   #+begin_src emacs-lisp
      (use-package ruff-format)
      (add-hook 'python-mode-hook 'ruff-format-on-save-mode)
    #+end_src
 
    #+begin_src emacs-lisp
-     (use-package python-mode
-       :hook (python-mode . (lambda ()
-     			 (define-key python-mode-map (kbd "TAB") 'completion-at-point)
-     			 (lsp-deferred))))
+     ;; in order to configure the built-in python mode use
+     (use-package python
+       :config
+       (define-key python-mode-map (kbd "<backtab>") 'indent-for-tab-command)
+       (define-key python-mode-map (kbd "TAB") 'completion-at-point))
+     ;; (use-package python-mode
+     ;;   :hook (python-mode . (lambda ()
+     ;; 			 (define-key python-mode-map (kbd "TAB") 'completion-at-point)
+     ;; 			 (lsp-deferred))))
        ;; :config
        ;; ;; (require 'dap-python)
        ;; (evil-define-key 'normal 'python-mode-map (kbd "SPC r i") 'py-switch-to-shell)
