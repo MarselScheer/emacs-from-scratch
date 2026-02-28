@@ -25,7 +25,9 @@ eshell-mode
 eca-chat-mode
 (d "maintain docstring for file")
 (r "review last commit")
-(t "load tdd-skill, run `make test` and start next implementation")
+(t "closely follow auto-tdd. create only one test and then do a minimal implementation")
+(nm "this is not a minimal implementation")
+(ot "only one test per tdd-cycle")
 
 ;; Local Variables:
 ;; mode: lisp-data

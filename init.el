@@ -361,7 +361,7 @@
 		    minimax/minimax-m2.5
 		    openai/gpt-oss-120b))))
 (define-key evil-motion-state-map (kbd "SPC a c") 'gptel)
-(define-key evil-motion-state-map (kbd "SPC a m") 'gptel-menu)
+(define-key evil-motion-state-map (kbd "SPC a SPC") 'gptel-menu)
 
 (use-package ragmacs
    :ensure t
@@ -459,9 +459,13 @@
   :ensure t
   :straight (:host github :repo "editor-code-assistant/eca-emacs" :files ("*.el")))
 ;; (setq eca-extra-args '("--verbose" "--log-level" "debug"))
+(define-key evil-motion-state-map (kbd "SPC a s") 'eca-stop)
+(define-key evil-motion-state-map (kbd "SPC a l") 'eca-chat-expand-all-blocks)
+(define-key evil-motion-state-map (kbd "SPC a h") 'eca-chat-collapse-all-blocks)
 (define-key evil-motion-state-map (kbd "SPC a e") 'eca-chat-toggle-window)
 (define-key evil-motion-state-map (kbd "SPC a r") 'eca-restart)
 (define-key evil-motion-state-map (kbd "SPC a s") 'eca-stop)
+(define-key evil-motion-state-map (kbd "SPC a m") 'eca-chat-cycle-agent)
 (defun ms/eca-rewrite-google-docstrings ()
   "Rewrite text with Google-style docstrings using eca-rewrite."
   (interactive)
