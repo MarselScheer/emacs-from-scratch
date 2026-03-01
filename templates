@@ -28,6 +28,7 @@ eca-chat-mode
 (t "closely follow auto-tdd. create only one test and then do a minimal implementation")
 (nm "this is not a minimal implementation")
 (ot "only one test per tdd-cycle")
+(nc "now code changes without creating a failing test first")
 
 ;; Local Variables:
 ;; mode: lisp-data

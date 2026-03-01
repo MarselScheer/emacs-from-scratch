@@ -131,11 +131,6 @@
   :config
   (corfu-terminal-mode +1))
 
-(use-package cape
-  :init
-  (add-hook 'prog-mode-hook (lambda () (add-hook 'completion-at-point-functions #'cape-file nil t)))
-)
-
 (use-package emacs
   :custom
   ;; TAB cycle if there are only few candidates
@@ -148,6 +143,11 @@
   ;; ;; mode.  Corfu commands are hidden, since they are not used via M-x. This
   ;; ;; setting is useful beyond Corfu.
   (read-extended-command-predicate #'command-completion-default-include-p))
+
+(use-package cape
+  :init
+  (add-hook 'prog-mode-hook (lambda () (add-hook 'completion-at-point-functions #'cape-file nil t)))
+)
 
 (use-package orderless
   :custom
@@ -459,13 +459,13 @@
   :ensure t
   :straight (:host github :repo "editor-code-assistant/eca-emacs" :files ("*.el")))
 ;; (setq eca-extra-args '("--verbose" "--log-level" "debug"))
-(define-key evil-motion-state-map (kbd "SPC a s") 'eca-stop)
 (define-key evil-motion-state-map (kbd "SPC a l") 'eca-chat-expand-all-blocks)
 (define-key evil-motion-state-map (kbd "SPC a h") 'eca-chat-collapse-all-blocks)
 (define-key evil-motion-state-map (kbd "SPC a e") 'eca-chat-toggle-window)
 (define-key evil-motion-state-map (kbd "SPC a r") 'eca-restart)
 (define-key evil-motion-state-map (kbd "SPC a s") 'eca-stop)
-(define-key evil-motion-state-map (kbd "SPC a m") 'eca-chat-cycle-agent)
+(define-key evil-motion-state-map (kbd "SPC a a") 'eca-chat-cycle-agent)
+(define-key evil-motion-state-map (kbd "SPC a m") 'eca-chat-select-model)
 (defun ms/eca-rewrite-google-docstrings ()
   "Rewrite text with Google-style docstrings using eca-rewrite."
   (interactive)

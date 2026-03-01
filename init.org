@@ -4,21 +4,22 @@
 * packages
 ** straight
    #+begin_src emacs-lisp
+     ;;; -*- lexical-binding: t -*-
      ;; instructions from the straight README
      (defvar bootstrap-version)
      (let ((bootstrap-file
-	    (expand-file-name
-	     "straight/repos/straight.el/bootstrap.el"
-	     (or (bound-and-true-p straight-base-dir)
-		 user-emacs-directory)))
-	   (bootstrap-version 7))
+     	    (expand-file-name
+     	     "straight/repos/straight.el/bootstrap.el"
+     	     (or (bound-and-true-p straight-base-dir)
+     		 user-emacs-directory)))
+     	   (bootstrap-version 7))
        (unless (file-exists-p bootstrap-file)
-	 (with-current-buffer
-	     (url-retrieve-synchronously
-	      "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-	      'silent 'inhibit-cookies)
-	   (goto-char (point-max))
-	   (eval-print-last-sexp)))
+     	 (with-current-buffer
+     	     (url-retrieve-synchronously
+     	      "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+     	      'silent 'inhibit-cookies)
+     	   (goto-char (point-max))
+     	   (eval-print-last-sexp)))
        (load bootstrap-file nil 'nomessage))
 
      (setq straight-use-package-by-default t)
@@ -177,6 +178,13 @@
        ;; ;; setting is useful beyond Corfu.
        (read-extended-command-predicate #'command-completion-default-include-p))
    #+end_src
+** cape
+#+begin_src emacs-lisp
+  (use-package cape
+    :init
+    (add-hook 'prog-mode-hook (lambda () (add-hook 'completion-at-point-functions #'cape-file nil t)))
+  )
+#+end_src
 ** orderless (filter results)
 
    #+begin_src emacs-lisp
@@ -305,14 +313,32 @@ commands
      (defun ms/generate-git-commit-msg ()
        "Generate a commit message using git diff and a python script."
        (interactive)
-       (let ((diff-file "/tmp/git-diff")
-             (msg-file "/tmp/commit-msg"))
-         ;; print diff-file
+       (let* ((diff-file "/tmp/git-diff")
+     	 (msg-file "/tmp/commit-msg")
+     	 (cmd (format "cd /home/m/.emacs.d/dspy-commit && uv run main.py %s %s" diff-file msg-file))
+     	 (target-buffer (current-buffer))
+     	 (sentinel (lambda (proc event)
+     		     (when (and (eq (process-status proc) 'exit)
+     				(zerop (process-exit-status proc))
+     				(file-exists-p msg-file))
+     		       (with-current-buffer target-buffer
+     			 (goto-char (point-min))
+     			 (insert-file-contents msg-file))
+     		       (let ((orig-bg (face-remap-add-relative 'default :background "DarkBlue")))
+     			 (run-with-timer 0.5 nil
+     					 (lambda (bg) (face-remap-remove-relative bg))
+     					 orig-bg))
+     		       (message "Commit message generated")))))
+         ;; Generate diff file synchronously (fast)
          (shell-command (format "git diff --staged > %s" diff-file))
-         (shell-command (format "cd /home/m/.emacs.d/dspy-commit && uv run main.py %s %s" diff-file msg-file))
-         (if (file-exists-p msg-file)
-             (insert-file-contents msg-file)
-           (message "Error: %s not found" msg-file))))
+         ;; Run the Python script asynchronously using make-process
+         (let ((proc (make-process
+     		 :name "gen-commit-msg"
+     		 :command (list "sh" "-c" cmd)
+     		 :noquery t
+     		 :sentinel sentinel)))
+           ;; Set the process to run in the background without blocking
+           (set-process-filter proc 'ignore))))
      (define-key evil-motion-state-map (kbd "SPC g m") 'ms/generate-git-commit-msg)
    #+end_src
 *** diff-hl
@@ -473,8 +499,8 @@ first char of a word (ace-jump)
       ;; `tempel-expand' *before* the main programming mode Capf, such
       ;; that it will be tried first.
       (setq-local completion-at-point-functions
-  		(cons #'tempel-expand
-  		      (remove #'tempel-expand completion-at-point-functions))))
+  		(cons #'tempel-expand (cons #'cape-file
+  		      (remove #'tempel-expand completion-at-point-functions)))))
 
     ;; (add-hook 'conf-mode-hook 'tempel-setup-capf)
     (add-hook 'lsp-completion-mode-hook 'tempel-setup-capf)
@@ -588,7 +614,7 @@ of a 'indentation-level' the cursor is in.
      		    minimax/minimax-m2.5
      		    openai/gpt-oss-120b))))
      (define-key evil-motion-state-map (kbd "SPC a c") 'gptel)
-     (define-key evil-motion-state-map (kbd "SPC a m") 'gptel-menu)
+     (define-key evil-motion-state-map (kbd "SPC a SPC") 'gptel-menu)
    #+end_src
 ** ragmacs
 #+begin_src emacs-lisp
@@ -723,9 +749,13 @@ of a 'indentation-level' the cursor is in.
     :ensure t
     :straight (:host github :repo "editor-code-assistant/eca-emacs" :files ("*.el")))
   ;; (setq eca-extra-args '("--verbose" "--log-level" "debug"))
+  (define-key evil-motion-state-map (kbd "SPC a l") 'eca-chat-expand-all-blocks)
+  (define-key evil-motion-state-map (kbd "SPC a h") 'eca-chat-collapse-all-blocks)
   (define-key evil-motion-state-map (kbd "SPC a e") 'eca-chat-toggle-window)
   (define-key evil-motion-state-map (kbd "SPC a r") 'eca-restart)
   (define-key evil-motion-state-map (kbd "SPC a s") 'eca-stop)
+  (define-key evil-motion-state-map (kbd "SPC a a") 'eca-chat-cycle-agent)
+  (define-key evil-motion-state-map (kbd "SPC a m") 'eca-chat-select-model)
   (defun ms/eca-rewrite-google-docstrings ()
     "Rewrite text with Google-style docstrings using eca-rewrite."
     (interactive)
