@@ -18,6 +18,7 @@ python-mode
 (pp "import pprint; pprint.pprint(" r ")")
 (li "logger.info(" r ")")
 (lif "logger.info(f'{" r "=}')")
+(ai "#AI: ")
 
 eshell-mode
 (de "setxkbmap de" r)
@@ -29,6 +30,9 @@ eca-chat-mode
 (nm "this is not a minimal implementation")
 (ot "only one test per tdd-cycle")
 (nc "now code changes without creating a failing test first")
+(chl "update changelog based on the commit in this branch")
+(mfs "maintain features and shortcomings in the aspect-folder")
+(uss "use the bash command `shortcomings` to add features. i manually installed it")
 
 ;; Local Variables:
 ;; mode: lisp-data
