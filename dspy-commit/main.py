@@ -26,7 +26,32 @@ def main():
     dspy.configure(lm=lm)
 
     class CommitSignature(dspy.Signature):
-        """Create a concise, descriptive commit message (80 characters or less) and if necessary a body. Include the type of change (feat, fix, docs, etc.) and a brief description"""
+        """Summarize changes in around 50 characters or less
+
+        More detailed explanatory text, if necessary. Wrap it to about 72
+        characters or so. In some contexts, the first line is treated as the
+        subject of the commit and the rest of the text as the body. The
+        blank line separating the summary from the body is critical (unless
+        you omit the body entirely); various tools like `log`, `shortlog`
+        and `rebase` can get confused if you run the two together.
+
+        Explain the problem that this commit is solving. Focus on why you
+        are making this change as opposed to how (the code explains that).
+        Are there side effects or other unintuitive consequences of this
+        change? Here's the place to explain them.
+
+        Further paragraphs come after blank lines.
+
+         - Bullet points are okay, too
+
+         - Typically a hyphen or asterisk is used for the bullet, preceded
+           by a single space, with blank lines in between, but conventions
+           vary here
+
+        Include the type of change (feat, fix, docs, etc.) and a brief description
+        """
+
+        # from https://chris.beams.io/git-commit, extended with type of change
 
         git_diff: str = dspy.InputField()
         commit_msg: str = dspy.OutputField()

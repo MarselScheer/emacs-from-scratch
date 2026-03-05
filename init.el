@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;; instructions from the straight README
 (defvar bootstrap-version)
 (let ((bootstrap-file
@@ -143,6 +144,11 @@
   ;; ;; setting is useful beyond Corfu.
   (read-extended-command-predicate #'command-completion-default-include-p))
 
+(use-package cape
+  :init
+  (add-hook 'prog-mode-hook (lambda () (add-hook 'completion-at-point-functions #'cape-file nil t)))
+)
+
 (use-package orderless
   :custom
   (completion-styles '(orderless basic)))
@@ -197,14 +203,32 @@
 (defun ms/generate-git-commit-msg ()
   "Generate a commit message using git diff and a python script."
   (interactive)
-  (let ((diff-file "/tmp/git-diff")
-        (msg-file "/tmp/commit-msg"))
-    ;; print diff-file
+  (let* ((diff-file "/tmp/git-diff")
+	 (msg-file "/tmp/commit-msg")
+	 (cmd (format "cd /home/m/.emacs.d/dspy-commit && uv run main.py %s %s" diff-file msg-file))
+	 (target-buffer (current-buffer))
+	 (sentinel (lambda (proc event)
+		     (when (and (eq (process-status proc) 'exit)
+				(zerop (process-exit-status proc))
+				(file-exists-p msg-file))
+		       (with-current-buffer target-buffer
+			 (goto-char (point-min))
+			 (insert-file-contents msg-file))
+		       (let ((orig-bg (face-remap-add-relative 'default :background "DarkBlue")))
+			 (run-with-timer 0.5 nil
+					 (lambda (bg) (face-remap-remove-relative bg))
+					 orig-bg))
+		       (message "Commit message generated")))))
+    ;; Generate diff file synchronously (fast)
     (shell-command (format "git diff --staged > %s" diff-file))
-    (shell-command (format "cd /home/m/.emacs.d/dspy-commit && uv run main.py %s %s" diff-file msg-file))
-    (if (file-exists-p msg-file)
-        (insert-file-contents msg-file)
-      (message "Error: %s not found" msg-file))))
+    ;; Run the Python script asynchronously using make-process
+    (let ((proc (make-process
+		 :name "gen-commit-msg"
+		 :command (list "sh" "-c" cmd)
+		 :noquery t
+		 :sentinel sentinel)))
+      ;; Set the process to run in the background without blocking
+      (set-process-filter proc 'ignore))))
 (define-key evil-motion-state-map (kbd "SPC g m") 'ms/generate-git-commit-msg)
 
 (use-package diff-hl
@@ -279,8 +303,8 @@
     ;; `tempel-expand' *before* the main programming mode Capf, such
     ;; that it will be tried first.
     (setq-local completion-at-point-functions
-		(cons #'tempel-expand
-		      (remove #'tempel-expand completion-at-point-functions))))
+		(cons #'tempel-expand (cons #'cape-file
+		      (remove #'tempel-expand completion-at-point-functions)))))
 
   ;; (add-hook 'conf-mode-hook 'tempel-setup-capf)
   (add-hook 'lsp-completion-mode-hook 'tempel-setup-capf)
@@ -337,7 +361,7 @@
 		    minimax/minimax-m2.5
 		    openai/gpt-oss-120b))))
 (define-key evil-motion-state-map (kbd "SPC a c") 'gptel)
-(define-key evil-motion-state-map (kbd "SPC a m") 'gptel-menu)
+(define-key evil-motion-state-map (kbd "SPC a SPC") 'gptel-menu)
 
 (use-package ragmacs
    :ensure t
@@ -435,9 +459,13 @@
   :ensure t
   :straight (:host github :repo "editor-code-assistant/eca-emacs" :files ("*.el")))
 ;; (setq eca-extra-args '("--verbose" "--log-level" "debug"))
+(define-key evil-motion-state-map (kbd "SPC a l") 'eca-chat-expand-all-blocks)
+(define-key evil-motion-state-map (kbd "SPC a h") 'eca-chat-collapse-all-blocks)
 (define-key evil-motion-state-map (kbd "SPC a e") 'eca-chat-toggle-window)
 (define-key evil-motion-state-map (kbd "SPC a r") 'eca-restart)
 (define-key evil-motion-state-map (kbd "SPC a s") 'eca-stop)
+(define-key evil-motion-state-map (kbd "SPC a a") 'eca-chat-cycle-agent)
+(define-key evil-motion-state-map (kbd "SPC a m") 'eca-chat-select-model)
 (defun ms/eca-rewrite-google-docstrings ()
   "Rewrite text with Google-style docstrings using eca-rewrite."
   (interactive)
