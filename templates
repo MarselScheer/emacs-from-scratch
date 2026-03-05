@@ -24,13 +24,14 @@ eshell-mode
 (de "setxkbmap de" r)
 
 eca-chat-mode
-(d "maintain docstring for file")
+(d "maintain docstring using the python-doc-manager skill for file `" r"`")
 (r "review last commit")
 (t "closely follow auto-tdd. create only one test and then do a minimal implementation")
+(nc "use list-all-shortcomings and recommend the next shortcoming to solve")
 (nm "this is not a minimal implementation")
 (ot "only one test per tdd-cycle")
 (nc "now code changes without creating a failing test first")
-(chl "update changelog based on the commit in this branch")
+(chl "update changelog based on the commit in this branch. make sure to also run the bash command `date` to get the date of today")
 (mfs "maintain features and shortcomings in the aspect-folder")
 (uss "use the bash command `shortcomings` to add features. i manually installed it")
 
