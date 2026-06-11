@@ -464,6 +464,8 @@
 
 (use-package eca
   :ensure t
+  :config
+  (setq eca-chat-use-side-window nil)
   :straight (:host github :repo "editor-code-assistant/eca-emacs" :files ("*.el")))
 ;; (setq eca-extra-args '("--verbose" "--log-level" "debug"))
 (define-key evil-motion-state-map (kbd "SPC a L") 'eca-chat-expand-all-blocks)
