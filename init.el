@@ -83,11 +83,18 @@
    'org-babel-load-languages
    '((python . t))))
 
+(defun ms/save-current-and-all-org-buffers ()
+  "Save the current buffer and all open Org mode buffers."
+  (interactive)
+  (save-buffer)
+  (org-save-all-org-buffers))
+
+
 (define-key evil-motion-state-map (kbd "SPC o a") 'org-agenda)
 (define-key evil-motion-state-map (kbd "SPC o i") 'org-indent-mode)
 (define-key evil-motion-state-map (kbd "SPC o f") 'org-cycle)
 (define-key evil-motion-state-map (kbd "SPC o c") 'org-toggle-checkbox)
-(define-key evil-motion-state-map (kbd "SPC o s") 'org-save-all-org-buffers)
+(define-key evil-motion-state-map (kbd "SPC o s") 'ms/save-current-and-all-org-buffers)
 (define-key evil-motion-state-map (kbd "SPC o h") 'org-toggle-heading)
 (define-key evil-motion-state-map (kbd "SPC n s") 'org-narrow-to-subtree)
 (define-key evil-motion-state-map (kbd "SPC n w") 'widen)
@@ -459,13 +466,18 @@
   :ensure t
   :straight (:host github :repo "editor-code-assistant/eca-emacs" :files ("*.el")))
 ;; (setq eca-extra-args '("--verbose" "--log-level" "debug"))
-(define-key evil-motion-state-map (kbd "SPC a l") 'eca-chat-expand-all-blocks)
-(define-key evil-motion-state-map (kbd "SPC a h") 'eca-chat-collapse-all-blocks)
+(define-key evil-motion-state-map (kbd "SPC a L") 'eca-chat-expand-all-blocks)
+(define-key evil-motion-state-map (kbd "SPC a H") 'eca-chat-collapse-all-blocks)
 (define-key evil-motion-state-map (kbd "SPC a e") 'eca-chat-toggle-window)
 (define-key evil-motion-state-map (kbd "SPC a r") 'eca-restart)
 (define-key evil-motion-state-map (kbd "SPC a s") 'eca-stop)
 (define-key evil-motion-state-map (kbd "SPC a a") 'eca-chat-cycle-agent)
 (define-key evil-motion-state-map (kbd "SPC a m") 'eca-chat-select-model)
+(define-key evil-motion-state-map (kbd "SPC a p") 'eca-chat-go-to-prev-user-message)
+(define-key evil-motion-state-map (kbd "SPC a n") 'eca-chat-go-to-next-user-message)
+(define-key evil-motion-state-map (kbd "SPC a k") 'eca-chat-go-to-prev-expandable-block)
+(define-key evil-motion-state-map (kbd "SPC a j") 'eca-chat-go-to-next-expandable-block)
+(define-key evil-motion-state-map (kbd "SPC a f") 'eca-chat-toggle-expandable-block)
 (defun ms/eca-rewrite-google-docstrings ()
   "Rewrite text with Google-style docstrings using eca-rewrite."
   (interactive)
@@ -616,10 +628,11 @@
   (fancy-compilation-mode))
 
 (use-package doom-themes)
-(load-theme 'doom-dracula t)
+;; (load-theme 'doom-dracula t)
 ;; (use-package cyberpunk-theme)
 ;; (load-theme 'cyberpunk t)
 ;; (consult-theme 'deeper-blue)
+(load-theme 'modus-vivendi-tinted t)
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

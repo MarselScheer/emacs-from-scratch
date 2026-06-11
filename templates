@@ -31,9 +31,11 @@ eca-chat-mode
 (nm "this is not a minimal implementation")
 (ot "only one test per tdd-cycle")
 (nc "now code changes without creating a failing test first")
-(chl "update changelog based on the commit in this branch. make sure to also run the bash command `date` to get the date of today")
-(mfs "maintain features and shortcomings in the aspect-folder")
+(mfs "based on the staged files and the code changes made in the current branch compared to origin/main, maintain features and shortcomings in the aspect-folder. If you want to add features or delete a shortcoming, use the bash command `shortcomings`. If you delete a shortcoming, consider creating a corresponding feature first.")
+(fos "based on the staged files and the code changes made in the current branch compared to origin/main, focus on the implementation and propose shortcomings of the implementation. Again consider only the changes made in the current branch")
 (uss "use the bash command `shortcomings` to add features. i manually installed it")
+(umt "use make target")
+(uc "update `CHANGELOG.md` based on the staged files using the unreleased section in the changelog")
 
 ;; Local Variables:
 ;; mode: lisp-data
