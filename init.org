@@ -601,13 +601,16 @@ of a 'indentation-level' the cursor is in.
        ;; (setq gptel-log-level 'debug)
        (setq gptel-default-mode #'org-mode)
        (setq gptel-org-branching-context t)
+       (setf (alist-get 'org-mode gptel-prompt-prefix-alist) "@user\n")
+       (setf (alist-get 'org-mode gptel-response-prefix-alist) "@assistant\n")
        (setq gptel-temperature 0.0)
        (global-set-key (kbd "C-c C-<return>") 'gptel-send)
        (add-to-list 'gptel-directives '(explain . "Explain the code to a novice programmer"))
        (gptel-make-ollama "Ollama"
          :host "localhost:11434"
          :stream t
-         :models '(codellama:7b))
+         :header `(("Authorization" . ,(concat "Bearer " (getenv "OLLAMA_API_KEY"))))
+         :models '(codellama:7b qwen3-coder:30b qwen3.5:4b qwen2.5-coder:7b gemma4:e4b gemma4:26b qwen3-coder:30b gemma4:cloud))
        (setq gptel-model   'google/gemini-3-flash-preview
      	gptel-backend
      	(gptel-make-openai "OpenRouter"               ;Any name you want
@@ -616,6 +619,8 @@ of a 'indentation-level' the cursor is in.
      	  :stream t
      	  :key (getenv "OPENROUTER_API_KEY")
      	  :models '(mistralai/mistral-small-3.2-24b-instruct
+     		    deepseek/deepseek-v4-pro
+     		    deepseek/deepseek-v4-flash
      		    google/gemini-3-flash-preview
      		    minimax/minimax-m2.1
      		    minimax/minimax-m2.5
