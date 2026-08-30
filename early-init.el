@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;; From straight README
 ;; Users of Emacs versions >= 27 will want to add:
 (setq package-enable-at-startup nil)
