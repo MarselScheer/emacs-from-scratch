@@ -11,7 +11,7 @@
  ("denote" . "a3077f05e8c2b2b348fc736e2718a8cf0e791237")
  ("diff-hl" . "b80ff9b4a772f7ea000e86fbf88175104ddf9557")
  ("difftastic.el" . "7db20929cac31687a529943c3d8d5b44fd8d69e2")
- ("eca-emacs" . "f700be30f1e59686dc0c805725d6260de4d936c1")
+ ("eca-emacs" . "aef067d10a5791838b5874376a015e93f671b0d6")
  ("el-get" . "ec5cba8d965980b2c47a8a11dce30dd5e845ed2a")
  ("eldoc" . "91a8ae2fa66ac09f45337f9eca6c7aa643a063f4")
  ("elisp-demos" . "1a108d1c5011f9ced58be2ca98bea1fbd4130a2f")
