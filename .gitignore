@@ -1,1 +1,16 @@
 
+/var/
+/transient/
+/tramp
+/tmp/
+/straight/
+/auto-save-list/
+/bookmarks
+/dspy-commit/uv.lock
+/eca/
+/eln-cache/
+/elpa/
+/eshell/
+/history
+/ielm-history.eld
+/projects

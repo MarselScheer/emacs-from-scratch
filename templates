@@ -18,17 +18,25 @@ python-mode
 (pp "import pprint; pprint.pprint(" r ")")
 (li "logger.info(" r ")")
 (lif "logger.info(f'{" r "=}')")
+(ai "#AI: ")
 
 eshell-mode
 (de "setxkbmap de" r)
 
 eca-chat-mode
-(d "maintain docstring for file")
+(d "maintain docstring using the python-doc-manager skill for file `" r"`")
 (r "review last commit")
 (t "closely follow auto-tdd. create only one test and then do a minimal implementation")
+(nc "use list-all-shortcomings and recommend the next shortcoming to solve")
 (nm "this is not a minimal implementation")
 (ot "only one test per tdd-cycle")
 (nc "now code changes without creating a failing test first")
+(chl "update changelog based on the staged files and the code changes made in the current branch compare to origin/main. make sure to also run the bash command `date` to get the date of today")
+(mfs "based on the staged files and the code changes made in the current branch compared to origin/main, maintain features and shortcomings in the aspect-folder. If you want to add features or delete a shortcoming, use the bash command `shortcomings`. If you delete a shortcoming, consider creating a corresponding feature first.")
+(fos "based on the staged files and the code changes made in the current branch compared to origin/main, focus on the implementation and propose shortcomings of the implementation. Again consider only the changes made in the current branch")
+(uss "use the bash command `shortcomings` to add features. i manually installed it")
+(umt "use make target")
+(uc "update/extend `CHANGELOG.md` based on the staged files using the unreleased section in the changelog")
 
 ;; Local Variables:
 ;; mode: lisp-data
