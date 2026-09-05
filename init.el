@@ -479,7 +479,7 @@
 (define-key evil-motion-state-map (kbd "SPC a r") 'eca-restart)
 (define-key evil-motion-state-map (kbd "SPC a S") 'eca-stop)
 (define-key evil-motion-state-map (kbd "SPC a R") 'eca-chat-resume)
-(define-key evil-motion-state-map (kbd "SPC a r") 'eca-chat-delete)
+(define-key evil-motion-state-map (kbd "SPC a d") 'eca-chat-delete)
 (define-key evil-motion-state-map (kbd "SPC a s") 'eca-chat-stop-prompt)
 (define-key evil-motion-state-map (kbd "SPC a a") 'eca-chat-cycle-agent)
 (define-key evil-motion-state-map (kbd "SPC a m") 'eca-chat-select-model)
