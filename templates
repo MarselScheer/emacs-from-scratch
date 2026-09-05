@@ -37,6 +37,13 @@ eca-chat-mode
 (uss "use the bash command `shortcomings` to add features. i manually installed it")
 (umt "use make target")
 (uc "update/extend `CHANGELOG.md` based on the staged files using the unreleased section in the changelog")
+(oe "/openspec-explore")
+(oe "/openspec-explore")
+(op "/openspec-propose")
+(oa "/openspec-apply-change")
+(oar "/openspec-archive-change")
+(ou "/openspec-update-change")
+
 
 ;; Local Variables:
 ;; mode: lisp-data
