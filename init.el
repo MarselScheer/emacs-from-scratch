@@ -238,6 +238,10 @@
       (set-process-filter proc 'ignore))))
 (define-key evil-motion-state-map (kbd "SPC g m") 'ms/generate-git-commit-msg)
 
+(use-package difftastic
+  :defer t
+  :straight (:host github :repo "pkryger/difftastic.el"))
+
 (use-package diff-hl
   :config (global-diff-hl-mode))
 
@@ -540,6 +544,17 @@
     (minuet-set-optional-options minuet-openai-compatible-options :max_tokens 56)
     (minuet-set-optional-options minuet-openai-compatible-options :top_p 0.9))
 
+(defun ms/eshell-history-select ()
+  "Select a command from eshell history using the minibuffer."
+  (interactive)
+  (let* ((history-list (delete-dups (ring-elements eshell-history-ring)))
+         (command (completing-read "Eshell history: " history-list nil t)))
+    (when command
+      (delete-region (save-excursion (eshell-bol) (point)) (point))
+      (insert command))))
+(evil-define-key 'insert eshell-mode-map (kbd "M-r") 'ms/eshell-history-select)
+(evil-define-key 'motion eshell-mode-map (kbd "M-r") 'ms/eshell-history-select)
+
 (use-package time-table
   :straight (time-table :type git :host github :repo "MarselScheer/time-table" :branch "time-table-buffer")
   :custom
@@ -578,6 +593,8 @@
 (setq python-shell-interpreter "uv")
 (setq python-shell-interpreter-args "run python -i")
 
+(global-set-key (kbd "C-x C-c") nil)
+
 (defvar my-intercept-mode-map (make-sparse-keymap)
   "High precedence keymap.")
 
@@ -609,6 +626,12 @@
 (define-key evil-motion-state-map (kbd "SPC m s") 'bookmark-set)
 (define-key evil-motion-state-map (kbd "SPC m j") 'bookmark-jump)
 (define-key evil-motion-state-map (kbd "SPC m J") 'bookmark-jump-other-window)
+
+;; https://mise.jdx.dev/ide-integration.html#emacs
+;; CLI tools installed by Mise
+;; See: https://www.emacswiki.org/emacs/ExecPath
+(setenv "PATH" (concat (getenv "PATH") ":/home/m/.local/share/mise/shims"))
+(setq exec-path (append exec-path '("/home/m/.local/share/mise/shims")))
 
 (global-visual-line-mode 1)
 (global-visual-wrap-prefix-mode 1)
