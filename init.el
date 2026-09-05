@@ -568,6 +568,12 @@
 (define-key evil-motion-state-map (kbd "SPC t b") 'time-table-find-tracking-file)
 (define-key evil-motion-state-map (kbd "SPC t e") 'time-table-end-tracking)
 
+(use-package openspecmacs
+  :straight (openspecmacs :type git
+			  :host github
+			  :repo "MarselScheer/openspecmacs"
+			  :branch "main"))
+
 (use-package ruff-format)
 (add-hook 'python-mode-hook 'ruff-format-on-save-mode)
 

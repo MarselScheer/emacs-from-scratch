@@ -868,6 +868,14 @@ of a 'indentation-level' the cursor is in.
   (define-key evil-motion-state-map (kbd "SPC t b") 'time-table-find-tracking-file)
   (define-key evil-motion-state-map (kbd "SPC t e") 'time-table-end-tracking)
 #+end_src
+** openspecmacs
+#+begin_src emacs-lisp
+  (use-package openspecmacs
+    :straight (openspecmacs :type git
+  			  :host github
+  			  :repo "MarselScheer/openspecmacs"
+  			  :branch "main"))
+#+end_src
 * languages
 ** debugging (deactivated)
    # #+begin_src emacs-lisp
