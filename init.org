@@ -611,7 +611,7 @@ of a 'indentation-level' the cursor is in.
          :stream t
          :header `(("Authorization" . ,(concat "Bearer " (getenv "OLLAMA_API_KEY"))))
          :models '(codellama:7b qwen3-coder:30b qwen3.5:4b qwen2.5-coder:7b gemma4:e4b gemma4:26b qwen3-coder:30b gemma4:cloud))
-       (setq gptel-model   'google/gemini-3-flash-preview
+       (setq gptel-model   'deepseek/deepseek-v4-flash
      	gptel-backend
      	(gptel-make-openai "OpenRouter"               ;Any name you want
      	  :host "openrouter.ai"
