@@ -190,7 +190,7 @@
   "Saves the current buffer and runs project-recompile"
   (interactive)
   (progn
-    (save-buffer)
+    (ms/save-current-and-all-org-buffers)
     (project-recompile)))
 (define-key evil-motion-state-map (kbd "SPC p s r") 'consult-ripgrep)
 (define-key evil-motion-state-map (kbd "SPC p c") 'project-compile)
