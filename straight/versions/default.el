@@ -47,7 +47,7 @@
  ("melpa" . "dd1d51facd6387fefe2143aaf0cafc556113a944")
  ("minuet-ai.el" . "d3ce06dfd33f475a63544c1937868a907553afae")
  ("nongnu-elpa" . "56748b48bec8af70101edaa57e35b0ac4c5b0151")
- ("openspecmacs" . "91cb830c3d1c247cf651faa0b3563ef9d79bfd9e")
+ ("openspecmacs" . "9167cc611bdec6108a4906115209c0be23fc4413")
  ("orderless" . "860a10222a1a6be3ea87a77d34d09cd0e2dfd422")
  ("org" . "07dd3bcae6b7b5e0692fc40dd307a7e841179b52")
  ("plz" . "981a4d09521ef59439713624702efcad996840a0")
