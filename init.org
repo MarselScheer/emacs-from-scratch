@@ -771,8 +771,8 @@ of a 'indentation-level' the cursor is in.
   ;; (setq eca-extra-args '("--verbose" "--log-level" "debug"))
   (define-key evil-motion-state-map (kbd "SPC a L") 'eca-chat-expand-all-blocks)
   (define-key evil-motion-state-map (kbd "SPC a H") 'eca-chat-collapse-all-blocks)
-  (define-key evil-motion-state-map (kbd "SPC a e") 'eca-chat-toggle-window)
-  (define-key evil-motion-state-map (kbd "SPC a r") 'eca-restart)
+  (define-key evil-motion-state-map (kbd "SPC a e") 'eca)
+  (define-key evil-motion-state-map (kbd "SPC a r r") 'eca-restart)
   (define-key evil-motion-state-map (kbd "SPC a S") 'eca-stop)
   (define-key evil-motion-state-map (kbd "SPC a R") 'eca-chat-resume)
   (define-key evil-motion-state-map (kbd "SPC a d") 'eca-chat-delete)
@@ -875,6 +875,9 @@ of a 'indentation-level' the cursor is in.
   			  :host github
   			  :repo "MarselScheer/openspecmacs"
   			  :branch "main"))
+  (with-eval-after-load 'evil
+    (evil-define-key 'normal openspecmacs-mode-map
+      "d" #'openspecmacs-show-change-diff))
 #+end_src
 * languages
 ** debugging (deactivated)

@@ -479,8 +479,8 @@
 ;; (setq eca-extra-args '("--verbose" "--log-level" "debug"))
 (define-key evil-motion-state-map (kbd "SPC a L") 'eca-chat-expand-all-blocks)
 (define-key evil-motion-state-map (kbd "SPC a H") 'eca-chat-collapse-all-blocks)
-(define-key evil-motion-state-map (kbd "SPC a e") 'eca-chat-toggle-window)
-(define-key evil-motion-state-map (kbd "SPC a r") 'eca-restart)
+(define-key evil-motion-state-map (kbd "SPC a e") 'eca)
+(define-key evil-motion-state-map (kbd "SPC a r r") 'eca-restart)
 (define-key evil-motion-state-map (kbd "SPC a S") 'eca-stop)
 (define-key evil-motion-state-map (kbd "SPC a R") 'eca-chat-resume)
 (define-key evil-motion-state-map (kbd "SPC a d") 'eca-chat-delete)
@@ -573,6 +573,9 @@
 			  :host github
 			  :repo "MarselScheer/openspecmacs"
 			  :branch "main"))
+(with-eval-after-load 'evil
+  (evil-define-key 'normal openspecmacs-mode-map
+    "d" #'openspecmacs-show-change-diff))
 
 (use-package ruff-format)
 (add-hook 'python-mode-hook 'ruff-format-on-save-mode)
