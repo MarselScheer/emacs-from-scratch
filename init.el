@@ -190,7 +190,7 @@
   "Saves the current buffer and runs project-recompile"
   (interactive)
   (progn
-    (save-buffer)
+    (ms/save-current-and-all-org-buffers)
     (project-recompile)))
 (define-key evil-motion-state-map (kbd "SPC p s r") 'consult-ripgrep)
 (define-key evil-motion-state-map (kbd "SPC p c") 'project-compile)
@@ -237,6 +237,10 @@
       ;; Set the process to run in the background without blocking
       (set-process-filter proc 'ignore))))
 (define-key evil-motion-state-map (kbd "SPC g m") 'ms/generate-git-commit-msg)
+
+(use-package difftastic
+  :defer t
+  :straight (:host github :repo "pkryger/difftastic.el"))
 
 (use-package diff-hl
   :config (global-diff-hl-mode))
@@ -358,7 +362,7 @@
     :stream t
     :header `(("Authorization" . ,(concat "Bearer " (getenv "OLLAMA_API_KEY"))))
     :models '(codellama:7b qwen3-coder:30b qwen3.5:4b qwen2.5-coder:7b gemma4:e4b gemma4:26b qwen3-coder:30b gemma4:cloud))
-  (setq gptel-model   'google/gemini-3-flash-preview
+  (setq gptel-model   'deepseek/deepseek-v4-flash
 	gptel-backend
 	(gptel-make-openai "OpenRouter"               ;Any name you want
 	  :host "openrouter.ai"
@@ -475,11 +479,11 @@
 ;; (setq eca-extra-args '("--verbose" "--log-level" "debug"))
 (define-key evil-motion-state-map (kbd "SPC a L") 'eca-chat-expand-all-blocks)
 (define-key evil-motion-state-map (kbd "SPC a H") 'eca-chat-collapse-all-blocks)
-(define-key evil-motion-state-map (kbd "SPC a e") 'eca-chat-toggle-window)
-(define-key evil-motion-state-map (kbd "SPC a r") 'eca-restart)
+(define-key evil-motion-state-map (kbd "SPC a e") 'eca)
+(define-key evil-motion-state-map (kbd "SPC a r r") 'eca-restart)
 (define-key evil-motion-state-map (kbd "SPC a S") 'eca-stop)
 (define-key evil-motion-state-map (kbd "SPC a R") 'eca-chat-resume)
-(define-key evil-motion-state-map (kbd "SPC a r") 'eca-chat-delete)
+(define-key evil-motion-state-map (kbd "SPC a d") 'eca-chat-delete)
 (define-key evil-motion-state-map (kbd "SPC a s") 'eca-chat-stop-prompt)
 (define-key evil-motion-state-map (kbd "SPC a a") 'eca-chat-cycle-agent)
 (define-key evil-motion-state-map (kbd "SPC a m") 'eca-chat-select-model)
@@ -540,6 +544,17 @@
     (minuet-set-optional-options minuet-openai-compatible-options :max_tokens 56)
     (minuet-set-optional-options minuet-openai-compatible-options :top_p 0.9))
 
+(defun ms/eshell-history-select ()
+  "Select a command from eshell history using the minibuffer."
+  (interactive)
+  (let* ((history-list (delete-dups (ring-elements eshell-history-ring)))
+         (command (completing-read "Eshell history: " history-list nil t)))
+    (when command
+      (delete-region (save-excursion (eshell-bol) (point)) (point))
+      (insert command))))
+(evil-define-key 'insert eshell-mode-map (kbd "M-r") 'ms/eshell-history-select)
+(evil-define-key 'motion eshell-mode-map (kbd "M-r") 'ms/eshell-history-select)
+
 (use-package time-table
   :straight (time-table :type git :host github :repo "MarselScheer/time-table" :branch "time-table-buffer")
   :custom
@@ -552,6 +567,15 @@
 (define-key evil-motion-state-map (kbd "SPC t S") 'time-table-summarize-projects-last-7-days)
 (define-key evil-motion-state-map (kbd "SPC t b") 'time-table-find-tracking-file)
 (define-key evil-motion-state-map (kbd "SPC t e") 'time-table-end-tracking)
+
+(use-package openspecmacs
+  :straight (openspecmacs :type git
+			  :host github
+			  :repo "MarselScheer/openspecmacs"
+			  :branch "main"))
+(with-eval-after-load 'evil
+  (evil-define-key 'normal openspecmacs-mode-map
+    "d" #'openspecmacs-show-change-diff))
 
 (use-package ruff-format)
 (add-hook 'python-mode-hook 'ruff-format-on-save-mode)
@@ -577,6 +601,8 @@
 
 (setq python-shell-interpreter "uv")
 (setq python-shell-interpreter-args "run python -i")
+
+(global-set-key (kbd "C-x C-c") nil)
 
 (defvar my-intercept-mode-map (make-sparse-keymap)
   "High precedence keymap.")
@@ -609,6 +635,12 @@
 (define-key evil-motion-state-map (kbd "SPC m s") 'bookmark-set)
 (define-key evil-motion-state-map (kbd "SPC m j") 'bookmark-jump)
 (define-key evil-motion-state-map (kbd "SPC m J") 'bookmark-jump-other-window)
+
+;; https://mise.jdx.dev/ide-integration.html#emacs
+;; CLI tools installed by Mise
+;; See: https://www.emacswiki.org/emacs/ExecPath
+(setenv "PATH" (concat (getenv "PATH") ":/home/m/.local/share/mise/shims"))
+(setq exec-path (append exec-path '("/home/m/.local/share/mise/shims")))
 
 (global-visual-line-mode 1)
 (global-visual-wrap-prefix-mode 1)

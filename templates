@@ -31,12 +31,45 @@ eca-chat-mode
 (nm "this is not a minimal implementation")
 (ot "only one test per tdd-cycle")
 (nc "now code changes without creating a failing test first")
-(chl "update changelog based on the staged files and the code changes made in the current branch compare to origin/main. make sure to also run the bash command `date` to get the date of today")
+(scid "Add to all new scenarios of specs in this change a unique id following the pattern [SC-yyyy-mm-dd_hh-mm-ss-<consecutive number>]. Use the current timestamp. Do not change the scenarios with ids.")
+(ttf "Assure that the task mention to first create the tests and reference the scenario id")
+(chl "update the version and the changelog based on the staged files and the code changes made in the current branch compare to origin/main. make sure to also run the bash command `date` to get the date of today")
 (mfs "based on the staged files and the code changes made in the current branch compared to origin/main, maintain features and shortcomings in the aspect-folder. If you want to add features or delete a shortcoming, use the bash command `shortcomings`. If you delete a shortcoming, consider creating a corresponding feature first.")
 (fos "based on the staged files and the code changes made in the current branch compared to origin/main, focus on the implementation and propose shortcomings of the implementation. Again consider only the changes made in the current branch")
 (uss "use the bash command `shortcomings` to add features. i manually installed it")
 (umt "use make target")
 (uc "update/extend `CHANGELOG.md` based on the staged files using the unreleased section in the changelog")
+(oe "/openspec-explore")
+(oe "/openspec-explore")
+(op "/openspec-propose")
+(oa "/openspec-apply-change")
+(oar "/openspec-archive-change")
+(ou "/openspec-update-change")
+text-mode
+(trin "Fill out this form for German-Russian vocabulary training and remove all other text:
+
+- *term*: Provided in Russian. Assure that the term is adding emphasis by capitalizing the stressed vowel (e.g., \"водА\"). Very likely this is not the case at first
+- *definition*: Write the German translation. Could be more than one if used in multiple contexts.
+- *tags*: Always =:vocabulary :german :russian=.
+- *depth*: 1 (very common) to 5 (rare). Use common judgment based on typical usage frequency.
+- *examples*: 2–3 Russian example sentences showing usage context (with german translation). Emphasize stressed vowels in all Russian words. It is important for proper parsing to indent the examples an start with a dash.
+- *notes*: Mention verb conjugation patterns, the imperfective and perfective form, noun plurals, or irregular forms relevant to the term.
+- *analogy*: Provide Russian synonyms or antonyms (with stressed vowels), optionally with a brief German note.
+
+Example output for term \"водА\":
+
+term:: водА
+definition:: Wasser
+tags:: :vocabulary :german :russian
+depth:: 1
+examples::
+  - Пить водУ нужно чИстой.
+  - В рекЕ хОлодная водА.
+  - Без воды нет жИзни.
+notes:: feminin, Genitiv: водЫ, Plural: водЫ
+analogy:: жИдкость (synonym), сУша (antonym)
+
+")
 
 ;; Local Variables:
 ;; mode: lisp-data
