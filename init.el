@@ -33,6 +33,7 @@
      (t
       (error "No configuration file found for %s" feature)))))
 
+(ms/require 'ms-basic-bindings)
 (ms/require 'ms-evil)
 (ms/require 'ms-org)
 (ms/require 'ms-minibuffer)
@@ -54,10 +55,10 @@
 (ms/require 'ms-timetable)
 (ms/require 'ms-openspecmacs)
 (ms/require 'ms-python)
-(ms/require' ms-basic-bindings)
 (ms/require 'ms-bookmark)
 (ms/require 'ms-mise)
 (ms/require 'ms-compilation)
 (ms/require 'ms-ui)
 (ms/require 'ms-backup)
 (ms/require 'ms-experimental)
+
